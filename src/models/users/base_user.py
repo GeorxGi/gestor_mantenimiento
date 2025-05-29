@@ -4,8 +4,8 @@ from enum import Enum
 #clase abstracta usuario, de aqui deberia derivar el ingeniero, supervisor y administrador
 #al ser abstracta, no se puede crear un "usuario" pero si sus derivados "ingeniero", "supervisor", etc
 class User(ABC):
-    def __init__(self, name:str, password:str, email:str):
-        self.name = name
+    def __init__(self, *,  username:str, password:str, email:str):
+        self.username = username
         self.email = email
         self.password = password
         self.access_level = self.define_access_level()
