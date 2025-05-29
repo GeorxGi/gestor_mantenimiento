@@ -1,12 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-class AccessLevel(Enum):
-    USER = 1
-    TECHNICIAN = 2
-    SUPERVISOR = 3
-    ADMIN = 10
-
 #clase abstracta usuario, de aqui deberia derivar el ingeniero, supervisor y administrador
 #al ser abstracta, no se puede crear un "usuario" pero si sus derivados "ingeniero", "supervisor", etc
 class User(ABC):
