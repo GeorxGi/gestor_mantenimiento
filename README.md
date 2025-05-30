@@ -11,7 +11,7 @@ Aplicación que permite a una empresa la gestión de inventario y el mantenimien
 git clone https://github.com/GeorxGi/gestor_mantenimiento
 ```
 
-* Dirigete al directorio en el que instalaste y abre el proyecto (preferiblemente con IntelliJ IDEA, pues es el IDe utilizado).
+* Dirigete al directorio en el que instalaste y abre el proyecto.
 
 * Crea un entorno virtual utilizando el comando
 
