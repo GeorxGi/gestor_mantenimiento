@@ -13,6 +13,18 @@ git clone https://github.com/GeorxGi/gestor_mantenimiento
 
 * Dirigete al directorio en el que instalaste y abre el proyecto (preferiblemente con IntelliJ IDEA, pues es el IDe utilizado).
 
+* Crea un entorno virtual utilizando el comando
+
+```bash
+python -m venv venv
+```
+* Activa el entorno virtual para el projecto con
+
+```bash
+venv\Scripts\activate
+```
+* Una vez realizado todo esto, en la terminar deberías ver un (venv) en el inicio
+
 * Para instalar las dependencias del proyecto utiliza el comando.
 
 ```bash
