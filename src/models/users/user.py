@@ -4,7 +4,7 @@ from src.utils.encrypter import hash_password
 
 #clase abstracta usuario, de aqui deberia derivar el ingeniero, supervisor y administrador
 #al ser abstracta, no se puede crear un "usuario" pero si sus derivados "ingeniero", "supervisor", etc
-class User(ABC):
+class User():
     def __init__(self, *,  username:str, password:str, email:str):
         self.username = username
         self.email = email
@@ -15,6 +15,9 @@ class User(ABC):
     def define_access_level(self) -> Enum:
         #Este metodo debe ser definido para cada usuario para asignar su nivel en jerarquia
         pass
+
+    def get_access_level(self) -> Enum:
+        return self.access_level
 
     def to_dict(self) -> dict:
         return {

@@ -5,10 +5,15 @@ import bcrypt
 load_dotenv()
 
 _ENCRYPT_PASSWORD = os.getenv('ENCRYPT_PASSWORD') if os.getenv('ENCRYPT_PASSWORD') else ''
+_ENCODE_TYPE = 'utf-8'
 
 def hash_password(to_encript:str) -> str:
-    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(to_encript.encode(_ENCODE_TYPE), bcrypt.gensalt())
 
-    hashed = bcrypt.hashpw(to_encript.encode(), salt)
+    return hashed.decode(_ENCODE_TYPE)
 
-    return hashed.decode('utf8')
+def compare_hashed(first:str, second:str):
+    return bcrypt.checkpw(
+        second.encode(_ENCODE_TYPE),
+        first.encode(_ENCODE_TYPE)
+    )
