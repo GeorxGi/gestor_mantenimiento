@@ -1,6 +1,6 @@
 import flet as ft
 
-def gradient_text(*, text:str, text_weight:ft.FontWeight = ft.FontWeight.NORMAL ,size:int, gradient:list[str]) -> ft.ShaderMask:
+def gradient_text(*, text:str, text_weight:ft.FontWeight = ft.FontWeight.BOLD, size:int, gradient:list[ft.Colors]) -> ft.ShaderMask:
     return ft.ShaderMask(
         content= ft.Text(
             text,
