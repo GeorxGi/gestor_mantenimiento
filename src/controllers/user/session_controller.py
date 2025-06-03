@@ -4,7 +4,9 @@
 #
 
 import json
+from src.controllers.user.user_controller import password_is_secure
 from src.utils.encrypter import compare_hashed
+from src.enums.register_cases import RegisterCases
 
 from src.enums.access_level import AccessLevel
 from src.models.users.user import User
@@ -15,15 +17,23 @@ from src.models.users.supervisor import Supervisor
 __file_name = 'registered_users.json'  # Nombre del archivo donde se guardarán los usuarios registrados
 
 #metodo en el que se añadirá la lógica de registro de usuarios,
-def register_user(new_user:User):
+def register_user(new_user:User) -> RegisterCases:
+    #Valida que el nombre de usuario y contraseña no esten vacios
+    if not new_user.username or not new_user.password:
+        return RegisterCases.EMPTY_INPUT
+
+    if not password_is_secure(new_user.password):
+        return RegisterCases.INVALID_PASSWORD
+
     if _search_user(username=new_user.username):  # Si el usuario ya existe, no se puede registrar
-        return False
+        return RegisterCases.USERNAME_TAKEN
     else:
         _save_new_user(new_user) # Guardar el usuario en el archivo
-        return True
+        return RegisterCases.CORRECT
 
 #Metodo en el que se añadirá la logica de inicio de sesión
 def login_user(*, username:str, password:str):
+    '''Metodo encargado del proceso de login, retorna un objeto usuario en caso de un proceso exitoso, por el contrario, retornará None'''
     try:
         with open(__file_name, 'r') as file:
             users = json.load(file)

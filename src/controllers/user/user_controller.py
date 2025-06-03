@@ -11,3 +11,21 @@ from src.models.users.user import User
 
 def check_access_level(user:User):
     return user.get_access_level()
+
+def password_is_secure(password:str):
+    has_number = False
+    has_special_char = False
+    has_mayus = False
+
+    if len(password) < 4: #Contraseña mayor a 4 caracteres
+        return False
+    else:
+        for char in password:
+            if not has_mayus and char.isupper():
+                has_mayus = True
+            if not has_number and  char.isnumeric():
+                has_number = True
+            if not has_special_char and char.isalnum():
+                has_special_char = True
+        is_valid_pass = has_mayus and has_number and has_special_char
+        return is_valid_pass
