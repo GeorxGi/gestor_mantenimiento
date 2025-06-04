@@ -16,6 +16,9 @@ def main(page: ft.Page):
             case '/login':
                 from src.views.login.login_view import LoginView
                 page.views.append(LoginView(page).build())
+            case '/register':
+                from src.views.login.register_view import RegisterView
+                page.views.append(RegisterView(page).build())
             case _:
                 page.views.append(ft.View(
                     route='/404',
