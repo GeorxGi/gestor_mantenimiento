@@ -14,15 +14,18 @@ def main(page: ft.Page):
             case '/':
                 if not page.views:
                     page.views.append(WelcomePage(page).build())
+                    return
             case '/login':
                 from src.views.login.login_view import LoginView
                 page.views.append(LoginView(page).build())
-            case _:
-                page.views.append(ft.View(
-                    route='/404',
-                    controls=[ft.Text('ERROR: Página no encontrada', size= 30)],
-                    vertical_alignment= ft.MainAxisAlignment.CENTER
-                ))
+                return
+
+        #Anexa esta página en caso de que la pagina indicada no fuera encontrada
+        page.views.append(ft.View(
+            route='/404',
+            controls=[ft.Text('ERROR: Página no encontrada', size= 30)],
+            vertical_alignment= ft.MainAxisAlignment.CENTER
+        ))
         page.update()
 
     def view_pop(e):
