@@ -14,7 +14,7 @@ def main(page: ft.Page):
         if page.views and page.views[-1].route == page.route:
             return
 
-        from src.utils.routes import get_view, debug_routes
+        from src.utils.routes import get_view
         from src.views.not_found_view import NotFound
 
         # Obtiene vista del registro o 404
