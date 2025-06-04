@@ -10,7 +10,7 @@ from src.enums.register_cases import RegisterCases
 
 from src.enums.access_level import AccessLevel
 from src.models.users.user import User
-from src.config import REGISTERED_USERS_PATH
+from src.utils.config import REGISTERED_USERS_PATH
 
 #metodo en el que se añadirá la lógica de registro de usuarios,
 def register_user(new_user:User) -> RegisterCases:

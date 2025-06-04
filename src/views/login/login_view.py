@@ -1,4 +1,5 @@
 import flet as ft
+from src.utils.routes import register_view
 
 from src.widgets.gradient_text import gradient_text
 from src.widgets.custom_text_field import CustomTextField
@@ -12,6 +13,7 @@ def _forgot_password():
     print('Evento para contraseña olvidada')
     pass
 
+@register_view("/login")
 class LoginView:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -84,7 +86,7 @@ class LoginView:
         """Inicializar la interfaz de login"""
         return ft.View(
             appbar= ft.AppBar(),
-            route='/login',
+            route="/login",
             vertical_alignment= ft.MainAxisAlignment.CENTER,
             horizontal_alignment= ft.CrossAxisAlignment.CENTER,
             controls=[
