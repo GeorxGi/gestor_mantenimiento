@@ -1,4 +1,5 @@
 import flet as ft
+
 from src.views.welcome_page_view import WelcomePage
 
 def main(page: ft.Page):
@@ -37,6 +38,6 @@ def main(page: ft.Page):
 
 ft.app(
     target= main,
-    view= ft.AppView.FLET_APP,
+    view= ft.AppView.WEB_BROWSER,
     assets_dir="assets",
 )

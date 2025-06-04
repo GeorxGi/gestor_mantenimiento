@@ -13,8 +13,7 @@ from src.models.users.user import User
 from src.models.users.admin import Admin
 from src.models.users.technician import Technician
 from src.models.users.supervisor import Supervisor
-
-__file_name = 'registered_users.json'  # Nombre del archivo donde se guardarán los usuarios registrados
+from src.config import REGISTERED_USERS_PATH
 
 #metodo en el que se añadirá la lógica de registro de usuarios,
 def register_user(new_user:User) -> RegisterCases:
@@ -35,7 +34,7 @@ def register_user(new_user:User) -> RegisterCases:
 def login_user(*, username:str, password:str):
     '''Metodo encargado del proceso de login, retorna un objeto usuario en caso de un proceso exitoso, por el contrario, retornará None'''
     try:
-        with open(__file_name, 'r') as file:
+        with open(REGISTERED_USERS_PATH, 'r') as file:
             users = json.load(file)
             for usr in users: #Iterar entre todos los usuarios registrados
                 if usr['username'] == username:
@@ -52,7 +51,7 @@ def login_user(*, username:str, password:str):
 
 def _search_user(*, username:str):
     try:
-        with open(__file_name, 'r') as file: #Cargar en memoria los usuarios
+        with open(REGISTERED_USERS_PATH, 'r') as file: #Cargar en memoria los usuarios
             usuarios = json.load(file)
             for user in usuarios: #Buscar el usuario por su nombre de usuario
                 if user['username'] == username: #Si el nombre de usuario coincide, devolver el usuario
@@ -64,14 +63,14 @@ def _search_user(*, username:str):
 
 def _save_new_user(new_user:User):
     try:
-        with open(__file_name, 'r') as file: #Cargar en memoria los usuarios
+        with open(REGISTERED_USERS_PATH, 'r') as file: #Cargar en memoria los usuarios
             saved_users = json.load(file)
     except FileNotFoundError:
         saved_users = []
 
     saved_users.append(new_user.to_dict()) #Añadir el nuevo usuario a la lista
 
-    with open(__file_name, 'w') as file:
+    with open(REGISTERED_USERS_PATH, 'w') as file:
         json.dump(saved_users, file, indent=4) #Guardar la lista de usuarios actualizada
 
 def _create_user(*, username:str, password:str, email:str, access_level:AccessLevel):
@@ -100,14 +99,15 @@ def _create_user(*, username:str, password:str, email:str, access_level:AccessLe
 if __name__ == '__main__': #Prueba cerrada
     user = _create_user(
         username='test_user',
-        password='12345',
+        password='Casco12345$',
         email='testing@mail.com',
         access_level= AccessLevel.TECHNICIAN
     )
-    print(type(user))
-    print(user.to_dict())
-    usr = login_user(username=user.username, password='12345')
-    print(type(usr))
+    print(type(user)) #Mostrar el tipo de objeto del usuario
+    print(user.to_dict()) #Mostrar sus datos en forma de diccionario
+    print(register_user(user)) #Mostrar que el registro arroje casos correctos
+    usr = login_user(username=user.username, password='Casco12345$')
+    print(type(usr)) #Mostrar que el login se haga exitosamente
     if usr is None:
         print('not logged')
     else:
