@@ -29,3 +29,25 @@ def password_is_secure(password:str):
                 has_special_char = True
         is_valid_pass = has_mayus and has_number and has_special_char
         return is_valid_pass
+
+def create_user(*, username:str, password:str, email:str, access_level:AccessLevel):
+    match access_level:
+        case AccessLevel.TECHNICIAN:
+            return Technician(
+                username=username,
+                password=password,
+                email= email,
+            )
+        case AccessLevel.SUPERVISOR:
+            return Supervisor(
+                username = username,
+                password=password,
+                email= email,
+            )
+        case AccessLevel.ADMIN:
+            return Admin(
+                username= username,
+                password=password,
+                email= email,
+            )
+    return None
