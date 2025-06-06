@@ -1,9 +1,9 @@
 import flet as ft
-
 def main(page: ft.Page):
     page.title= 'Gestor mantenimiento'
     page.theme_mode = ft.ThemeMode.LIGHT
     page.window.width = 500
+    page.window.height = 900
     page.bgcolor = ft.Colors.GREY_100
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
 
