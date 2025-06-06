@@ -1,7 +1,11 @@
 import flet as ft
+from src.utils.routes import register_view
+
 from src.widgets.gradient_text import gradient_text
 from src.widgets.custom_text_field import CustomTextField
 from src.widgets.gradient_button import gradient_button
+from src.widgets.custom_snack_bar import custom_snack_bar
+
 from src.consts.colors import gradient_colors
 from src.controllers.user.session_controller import login_user
 
@@ -9,6 +13,7 @@ def _forgot_password():
     print('Evento para contraseña olvidada')
     pass
 
+@register_view("/login")
 class LoginView:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -18,28 +23,18 @@ class LoginView:
         password = self.password_text_field.value
         if not username or not password:
             self.page.open(
-                self.local_snack_bar('Rellene los campos')
+                custom_snack_bar(content= 'Rellene los campos')
             )
             return
         user = login_user(username= username, password= password)
         if not user:
             self.page.open(
-                self.local_snack_bar('Usuario o contraseña incorrectos')
+                custom_snack_bar(content= 'Usuario o contraseña incorrectos')
             )
             return
         else:
             print('Login exitoso')
             pass #IMPLEMENTAR MAS FUNCIONALIDAD
-
-    @staticmethod
-    def local_snack_bar(error:str)-> ft.SnackBar:
-        return ft.SnackBar(
-        bgcolor= ft.Colors.BLUE,
-        content= ft.Text(
-            value= error,
-            color= ft.Colors.WHITE
-        ),
-    )
 
     username_text_field = CustomTextField(
         hint_label= "Usuario",
@@ -91,7 +86,7 @@ class LoginView:
         """Inicializar la interfaz de login"""
         return ft.View(
             appbar= ft.AppBar(),
-            route='/login',
+            route="/login",
             vertical_alignment= ft.MainAxisAlignment.CENTER,
             horizontal_alignment= ft.CrossAxisAlignment.CENTER,
             controls=[

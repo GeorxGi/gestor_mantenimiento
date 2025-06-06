@@ -1,9 +1,11 @@
 import flet as ft
+from src.utils.routes import register_view
+
 from src.widgets.gradient_button import gradient_button
 from src.widgets.gradient_text import gradient_text
 from src.consts.colors import gradient_colors, purple_color
 
-
+@register_view('/')
 class WelcomePage:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -36,13 +38,14 @@ class WelcomePage:
                             bgcolor= purple_color,
                         ),
                         gradient_button(
+                            on_click= lambda e: self._go_to_login(),
                             text='Iniciar sesión',
                             gradient=gradient_colors,
-                            on_click= lambda e: self._go_to_login(),
                             width=350,
                             height= 48,
                         ),
                         ft.OutlinedButton(
+                            on_click= lambda e: self._go_to_register(),
                             content= gradient_text(text='Registrarse', gradient=gradient_colors, size=20),
                             on_click= lambda e: self._go_to_register(),
                             width= 350,

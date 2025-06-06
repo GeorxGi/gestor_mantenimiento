@@ -4,17 +4,13 @@
 #
 
 import json
-from src.controllers.user.user_controller import password_is_secure
+from src.controllers.user.user_controller import password_is_secure, create_user
 from src.utils.encrypter import compare_hashed
 from src.enums.register_cases import RegisterCases
 
 from src.enums.access_level import AccessLevel
 from src.models.users.user import User
-from src.models.users.admin import Admin
-from src.models.users.technician import Technician
-from src.models.users.supervisor import Supervisor
-
-__file_name = 'registered_users.json'  # Nombre del archivo donde se guardarán los usuarios registrados
+from src.utils.config import REGISTERED_USERS_PATH
 
 #metodo en el que se añadirá la lógica de registro de usuarios,
 def register_user(new_user:User) -> RegisterCases:
@@ -25,7 +21,7 @@ def register_user(new_user:User) -> RegisterCases:
     if not password_is_secure(new_user.password):
         return RegisterCases.INVALID_PASSWORD
 
-    if _search_user(username=new_user.username):  # Si el usuario ya existe, no se puede registrar
+    if _username_is_taken(username=new_user.username):  # Si el usuario ya existe, no se puede registrar
         return RegisterCases.USERNAME_TAKEN
     else:
         _save_new_user(new_user) # Guardar el usuario en el archivo
@@ -33,14 +29,14 @@ def register_user(new_user:User) -> RegisterCases:
 
 #Metodo en el que se añadirá la logica de inicio de sesión
 def login_user(*, username:str, password:str):
-    '''Metodo encargado del proceso de login, retorna un objeto usuario en caso de un proceso exitoso, por el contrario, retornará None'''
+    """Metodo encargado del proceso de login, retorna un objeto usuario en caso de un proceso exitoso, por el contrario, retornará None"""
     try:
-        with open(__file_name, 'r') as file:
+        with open(REGISTERED_USERS_PATH, 'r') as file:
             users = json.load(file)
             for usr in users: #Iterar entre todos los usuarios registrados
                 if usr['username'] == username:
                     if compare_hashed(usr['password'], password): #Compara las contraseñas encriptadas
-                        return _create_user(
+                        return create_user(
                             username= usr['username'],
                             password= usr['password'],
                             email=usr['email'],
@@ -50,64 +46,44 @@ def login_user(*, username:str, password:str):
     except FileNotFoundError:
         return None
 
-def _search_user(*, username:str):
+def _username_is_taken(*, username:str):
+    """Recibe un username e indica si existe algún usuario registrado con este mismo nombre de usuario"""
     try:
-        with open(__file_name, 'r') as file: #Cargar en memoria los usuarios
+        with open(REGISTERED_USERS_PATH, 'r') as file: #Cargar en memoria los usuarios
             usuarios = json.load(file)
             for user in usuarios: #Buscar el usuario por su nombre de usuario
                 if user['username'] == username: #Si el nombre de usuario coincide, devolver el usuario
-                    return user
-
-        return None
+                    return True
     except FileNotFoundError: #Si el archivo no existe, devolver None
-        return None
+        return False
+    return False
 
 def _save_new_user(new_user:User):
+    """Recibe un usuario y lo guarda en el archivo local que los almacena"""
+    saved_users = []
     try:
-        with open(__file_name, 'r') as file: #Cargar en memoria los usuarios
+        with open(REGISTERED_USERS_PATH, 'r') as file: #Cargar en memoria los usuarios
             saved_users = json.load(file)
     except FileNotFoundError:
         saved_users = []
 
     saved_users.append(new_user.to_dict()) #Añadir el nuevo usuario a la lista
 
-    with open(__file_name, 'w') as file:
+    with open(REGISTERED_USERS_PATH, 'w') as file:
         json.dump(saved_users, file, indent=4) #Guardar la lista de usuarios actualizada
 
-def _create_user(*, username:str, password:str, email:str, access_level:AccessLevel):
-    match access_level:
-        case AccessLevel.TECHNICIAN:
-            return Technician(
-                username=username,
-                password=password,
-                email= email,
-            )
-        case AccessLevel.SUPERVISOR:
-            return Supervisor(
-                username = username,
-                password=password,
-                email= email,
-            )
-        case AccessLevel.ADMIN:
-            return Admin(
-                username= username,
-                password=password,
-                email= email,
-            )
-        case _:
-            return None
-
 if __name__ == '__main__': #Prueba cerrada
-    user = _create_user(
+    user = create_user(
         username='test_user',
-        password='12345',
+        password='Casco12345$',
         email='testing@mail.com',
         access_level= AccessLevel.TECHNICIAN
     )
-    print(type(user))
-    print(user.to_dict())
-    usr = login_user(username=user.username, password='12345')
-    print(type(usr))
+    print(type(user)) #Mostrar el tipo de objeto del usuario
+    print(user.to_dict()) #Mostrar sus datos en forma de diccionario
+    print(register_user(user)) #Mostrar que el registro arroje casos correctos
+    usr = login_user(username=user.username, password='Casco12345$')
+    print(type(usr)) #Mostrar que el login se haga exitosamente
     if usr is None:
         print('not logged')
     else:
