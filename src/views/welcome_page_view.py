@@ -45,7 +45,6 @@ class WelcomePage:
                             height= 48,
                         ),
                         ft.OutlinedButton(
-                            on_click= lambda e: self._go_to_register(),
                             content= gradient_text(text='Registrarse', gradient=gradient_colors, size=20),
                             on_click= lambda e: self._go_to_register(),
                             width= 350,
