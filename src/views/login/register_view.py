@@ -1,10 +1,13 @@
 import flet as ft
+from src.utils.routes import register_view
+
 from src.widgets.gradient_text import gradient_text
 from src.widgets.custom_text_field import CustomTextField
 from src.widgets.gradient_button import gradient_button
 from src.consts.colors import gradient_colors
 from src.controllers.user.session_controller import register_user
 
+@register_view("/register")
 class RegisterView:
     def __init__(self, page: ft.Page):
         self.page = page
