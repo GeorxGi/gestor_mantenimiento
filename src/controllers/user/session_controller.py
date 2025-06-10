@@ -4,7 +4,7 @@
 #
 
 import json
-from src.controllers.user.user_controller import password_is_secure, create_user, is_valid_mail
+from src.controllers.user.user_controller import password_is_secure, __create_user, is_valid_mail
 from src.utils.encrypter import compare_hashed
 from src.enums.register_cases import RegisterCases
 
@@ -17,8 +17,11 @@ def register_user(*, username:str, password:str, email: str, access_level:Access
     """Recibe los datos de un usuario, y si todas las validaciones son correctas,
     lo almacena localmente, si no, retorna un enum RegisterCase con el error ocurrido"""
     #Valida que el nombre de usuario y contraseña no esten vacios
-    if not username or not password or not email:
+    if not username or not password or not email or not access_level:
         return RegisterCases.EMPTY_INPUT
+
+    if not isinstance(access_level, AccessLevel):
+        return RegisterCases.INVALID_ACCESS_LEVEL
 
     if not password_is_secure(password):
         return RegisterCases.INVALID_PASSWORD
@@ -29,7 +32,7 @@ def register_user(*, username:str, password:str, email: str, access_level:Access
     if _username_is_taken(username):  # Si el usuario ya existe, no se puede registrar
         return RegisterCases.USERNAME_TAKEN
     else:
-        new_user = create_user(
+        new_user = __create_user(
             username=username,
             password=password,
             email=email,
@@ -49,7 +52,8 @@ def login_user(*, username:str, password:str):
             for usr in users: #Iterar entre todos los usuarios registrados
                 if usr['username'] == username:
                     if compare_hashed(usr['password'], password): #Compara las contraseñas encriptadas
-                        return create_user(
+                        return __create_user(
+                            user_id= usr['id'],
                             username= usr['username'],
                             password= usr['password'],
                             email=usr['email'],
@@ -86,24 +90,17 @@ def _save_new_user(new_user:User):
         json.dump(saved_users, file, indent=4) #Guardar la lista de usuarios actualizada
 
 if __name__ == '__main__': #Prueba cerrada
-    user = create_user(
-        username='test_user',
-        password='Casco12345$',
-        email='testing@mail.com',
-        access_level= AccessLevel.TECHNICIAN
-    )
-    print(type(user)) #Mostrar el tipo de objeto del usuario
-    print(user.to_dict()) #Mostrar sus datos en forma de diccionario
-    print(register_user(
-        username= user.username,
-        password= 'Casco12345$',
-        email= user.email,
-        access_level= user.access_level,
-    )) #Mostrar que el registro arroje casos correctos
-    usr = login_user(username=user.username, password='Casco12345$')
-    print(type(usr)) #Mostrar que el login se haga exitosamente
-    if usr is None:
-        print('not logged')
+    user = login_user(username='usr',password='Casco12345$')
+    if user is None:
+        print('Registrando usuario')
+        print(  register_user(
+                    username= 'usr',
+                    password= 'Casco12345$',
+                    email= 'testing@mail.com',
+                    access_level= 'yes',
+        ))
     else:
-        print('logged in')
+        print('Usuario existe')
+        print(type(user))
+        print(user.to_dict())
 

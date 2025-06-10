@@ -6,3 +6,4 @@ class RegisterCases(Enum):
     USERNAME_TAKEN = 2,
     EMPTY_INPUT = 3,
     INVALID_EMAIL = 4,
+    INVALID_ACCESS_LEVEL = 5,

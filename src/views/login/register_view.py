@@ -59,6 +59,8 @@ class RegisterView:
                 self.page.open(custom_snack_bar(content= 'Rellene los campos'))
             case RegisterCases.INVALID_EMAIL:
                 self.page.open(custom_snack_bar(content= 'Correo electrónico no válido'))
+            case RegisterCases.INVALID_ACCESS_LEVEL:
+                self.page.open(custom_snack_bar(content= 'Nivel de acceso no válido'))
             case RegisterCases.CORRECT:
                 self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
                 self._close_view()

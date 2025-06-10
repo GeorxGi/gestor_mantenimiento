@@ -14,6 +14,8 @@ def check_access_level(user:User):
     return user.get_access_level()
 
 def password_is_secure(password:str) -> bool:
+    """Recibe un string y retorna un booleano que indica si la cadena representa
+    una contraseña que cumpla los requisitos de seguridad"""
     has_number = False
     has_mayus = False
 
@@ -29,28 +31,34 @@ def password_is_secure(password:str) -> bool:
         return is_valid_pass
 
 def is_valid_mail(email:str) -> bool:
+    """Recibe un string y retorna un booleano que indica si la cadena representa
+    un correo elecronico valido"""
     #cadena Regex tomada de internet, muchas ganas intentar entender esto
     email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
     if re.fullmatch(email_regex, email):
         return True
     return False
 
-def create_user(*, username:str, password:str, email:str, access_level:AccessLevel):
+def __create_user(*, user_id:str = '', username:str, password:str, email:str, access_level:AccessLevel):
+    """Crea una instancia de usuario en base a los datos ingresados"""
     match access_level:
         case AccessLevel.TECHNICIAN:
             return Technician(
+                id= user_id,
                 username=username,
                 password=password,
                 email= email,
             )
         case AccessLevel.SUPERVISOR:
             return Supervisor(
+                id= user_id,
                 username = username,
                 password=password,
                 email= email,
             )
         case AccessLevel.ADMIN:
             return Admin(
+                id= user_id,
                 username= username,
                 password=password,
                 email= email,

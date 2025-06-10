@@ -1,11 +1,16 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from src.utils.encrypter import hash_password
+import uuid
 
 #clase abstracta usuario, de aqui deberia derivar el ingeniero, supervisor y administrador
 #al ser abstracta, no se puede crear un "usuario" pero si sus derivados "ingeniero", "supervisor", etc
-class User():
-    def __init__(self, *,  username:str, password:str, email:str):
+class User(ABC):
+    def __init__(self, *,  username:str, password:str, email:str, id:str = ''):
+        if not id:
+            self.id = str(uuid.uuid4())
+        else:
+            self.id = id
         self.username = username
         self.email = email
         self.password = password
@@ -21,6 +26,7 @@ class User():
 
     def to_dict(self) -> dict:
         return {
+            "id": self.id,
             "username": self.username,
             "email": self.email,
             "password": hash_password(self.password), #Almacena la contraseña de forma encriptada
