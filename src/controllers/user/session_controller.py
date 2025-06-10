@@ -4,6 +4,7 @@
 #
 
 import json
+
 from src.controllers.user.user_controller import password_is_secure, _create_user_from_dict, is_valid_mail
 from src.utils.encrypter import compare_hashed
 from src.enums.register_cases import RegisterCases
@@ -85,8 +86,33 @@ def _save_new_user(new_user:User):
     with open(REGISTERED_USERS_PATH, 'w') as file:
         json.dump(saved_users, file, indent=4) #Guardar la lista de usuarios actualizada
 
+def _update_user(user_id:str, new_value:dict):
+    try:
+        with open(REGISTERED_USERS_PATH, 'r') as file:
+            saved_users = json.load(file)
+            user_found = False
+            for usr in saved_users:
+                if usr.get("id", "") == user_id:
+                    for key, value in new_value.items():
+                        if key in usr and key != "id" and key != "password":
+                            usr[key] = value
+                            user_found = True
+                            break
+            if user_found:
+                with open(REGISTERED_USERS_PATH, "w") as file:
+                    json.dump(saved_users, file, indent=4)
+                    return True
+            else:
+                return False
+    except FileNotFoundError:
+        return False
+
 if __name__ == '__main__': #Prueba cerrada
-    user = login_user(username='usr',password='Casco12345$')
+    user = login_user(username='NuevoUsername',password='Casco12345$')
+
+    if user is not None:
+        print(_update_user(user_id= user.id, new_value={"username": 'test_user'}))
+
     if user is None:
         print('Registrando usuario')
         print(  register_user(
