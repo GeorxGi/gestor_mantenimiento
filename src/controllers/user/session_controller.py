@@ -4,7 +4,7 @@
 #
 
 import json
-from src.controllers.user.user_controller import password_is_secure, __create_user, is_valid_mail
+from src.controllers.user.user_controller import password_is_secure, _create_user_from_dict, is_valid_mail
 from src.utils.encrypter import compare_hashed
 from src.enums.register_cases import RegisterCases
 
@@ -13,11 +13,11 @@ from src.models.users.user import User
 from src.utils.config import REGISTERED_USERS_PATH
 
 #metodo en el que se añadirá la lógica de registro de usuarios,
-def register_user(*, username:str, password:str, email: str, access_level:AccessLevel) -> RegisterCases:
+def register_user(*, fullname:str, username:str, password:str, email: str, access_level:AccessLevel) -> RegisterCases:
     """Recibe los datos de un usuario, y si todas las validaciones son correctas,
     lo almacena localmente, si no, retorna un enum RegisterCase con el error ocurrido"""
     #Valida que el nombre de usuario y contraseña no esten vacios
-    if not username or not password or not email or not access_level:
+    if not fullname or not username or not password or not email or not access_level:
         return RegisterCases.EMPTY_INPUT
 
     if not isinstance(access_level, AccessLevel):
@@ -31,15 +31,17 @@ def register_user(*, username:str, password:str, email: str, access_level:Access
 
     if _username_is_taken(username):  # Si el usuario ya existe, no se puede registrar
         return RegisterCases.USERNAME_TAKEN
-    else:
-        new_user = __create_user(
-            username=username,
-            password=password,
-            email=email,
-            access_level=access_level
-        )
-        _save_new_user(new_user) # Guardar el usuario en el archivo
-        return RegisterCases.CORRECT
+
+    user_dict = {
+        "fullname": fullname,
+        "username": username,
+        "password": password,
+        "email": email,
+        "access_level": access_level.name
+    }
+    new_user = _create_user_from_dict(user_dict)
+    _save_new_user(new_user) # Guardar el usuario en el archivo
+    return RegisterCases.CORRECT
 
 #Metodo en el que se añadirá la logica de inicio de sesión
 def login_user(*, username:str, password:str):
@@ -50,15 +52,9 @@ def login_user(*, username:str, password:str):
         with open(REGISTERED_USERS_PATH, 'r') as file:
             users = json.load(file)
             for usr in users: #Iterar entre todos los usuarios registrados
-                if usr['username'] == username:
-                    if compare_hashed(usr['password'], password): #Compara las contraseñas encriptadas
-                        return __create_user(
-                            user_id= usr['id'],
-                            username= usr['username'],
-                            password= usr['password'],
-                            email=usr['email'],
-                            access_level= AccessLevel.from_string(usr['access_level']),
-                        )
+                if usr.get("username", "") == username:
+                    if compare_hashed(usr.get("password", ""), password): #Compara las contraseñas encriptadas
+                        return _create_user_from_dict(usr)
             return None
     except FileNotFoundError:
         return None
@@ -94,10 +90,11 @@ if __name__ == '__main__': #Prueba cerrada
     if user is None:
         print('Registrando usuario')
         print(  register_user(
+                    fullname= 'Usuario Prueba Ramirez',
                     username= 'usr',
                     password= 'Casco12345$',
                     email= 'testing@mail.com',
-                    access_level= 'yes',
+                    access_level= AccessLevel.TECHNICIAN,
         ))
     else:
         print('Usuario existe')

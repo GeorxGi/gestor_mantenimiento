@@ -6,14 +6,12 @@ import uuid
 #clase abstracta usuario, de aqui deberia derivar el ingeniero, supervisor y administrador
 #al ser abstracta, no se puede crear un "usuario" pero si sus derivados "ingeniero", "supervisor", etc
 class User(ABC):
-    def __init__(self, *,  username:str, password:str, email:str, id:str = ''):
-        if not id:
-            self.id = str(uuid.uuid4())
-        else:
-            self.id = id
+    def __init__(self, *,  fullname:str, username:str, password:str, email:str, id:str = ''):
+        self.id = id if id else str(uuid.uuid4())
+        self.fullname = fullname
         self.username = username
+        self.password = hash_password(password)
         self.email = email
-        self.password = password
         self.access_level = self.define_access_level()
 
     @abstractmethod
@@ -25,10 +23,17 @@ class User(ABC):
         return self.access_level
 
     def to_dict(self) -> dict:
-        return {
-            "id": self.id,
-            "username": self.username,
-            "email": self.email,
-            "password": hash_password(self.password), #Almacena la contraseña de forma encriptada
-            "access_level": self.access_level.name
-        }
+        data = {key: value for key, value in vars(self).items() if key != "access_level"}
+        data["access_level"] = self.access_level.name
+
+        return data
+
+    @classmethod
+    def from_dict(cls, data:dict):
+        return cls(
+            id=data.get("id", ""),
+            fullname=data.get("fullname", ""),
+            username=data.get("username", ""),
+            password=data.get("password", ""),
+            email=data.get("email", ""),
+        )

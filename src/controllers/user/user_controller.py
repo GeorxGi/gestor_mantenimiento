@@ -39,30 +39,15 @@ def is_valid_mail(email:str) -> bool:
         return True
     return False
 
-def __create_user(*, user_id:str = '', username:str, password:str, email:str, access_level:AccessLevel):
+def _create_user_from_dict(user_dict:dict):
     """Crea una instancia de usuario en base a los datos ingresados"""
-    match access_level:
+    match AccessLevel.from_string(str(user_dict.get("access_level", ""))):
         case AccessLevel.TECHNICIAN:
-            return Technician(
-                id= user_id,
-                username=username,
-                password=password,
-                email= email,
-            )
+            return Technician.from_dict(user_dict)
         case AccessLevel.SUPERVISOR:
-            return Supervisor(
-                id= user_id,
-                username = username,
-                password=password,
-                email= email,
-            )
+            return Supervisor.from_dict(user_dict)
         case AccessLevel.ADMIN:
-            return Admin(
-                id= user_id,
-                username= username,
-                password=password,
-                email= email,
-            )
+            return Admin.from_dict(user_dict)
     return None
 
 #Pruebas unitarias
