@@ -30,6 +30,7 @@ class RegisterView:
     
     def _register(self):
         email = self.email_text_field.value
+        fullname = self.fullname_text_field.value
         username = self.username_text_field.value
         password = self.password_text_field.value
         agreement = self.CheckBox_Agreement.value
@@ -49,6 +50,7 @@ class RegisterView:
             password=password,
             email= email,
             access_level= access_level,
+            fullname= fullname
         )
         match register_result:
             case RegisterCases.INVALID_PASSWORD:
@@ -70,6 +72,11 @@ class RegisterView:
         hint_label= "Correo electrónico",
         width= 350,
         icon= ft.Icons.EMAIL
+    )
+    fullname_text_field = CustomTextField(
+        hint_label= 'Nombre completo',
+        width= 350,
+        icon= ft.Icons.PERSON
     )
     username_text_field = CustomTextField(
         hint_label= "Usuario",
@@ -126,6 +133,7 @@ class RegisterView:
                         color= ft.Colors.GREY_500,
                     ),
                 ),
+                fullname_text_field,
                 email_text_field,
                 username_text_field,
                 password_text_field,

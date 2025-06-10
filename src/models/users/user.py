@@ -28,6 +28,16 @@ class User(ABC):
 
         return data
 
+    def to_simple_dict(self):
+        """Metodo que retorna un diccionario con datos básicos del usuario,
+        para evitar comprometer datos como contraseñas, nombres de usuario, etc"""
+        return {
+            "id": self.id,
+            "fullname": self.fullname,
+            "email": self.email,
+            "access_level": self.access_level.name,
+        }
+
     @classmethod
     def from_dict(cls, data:dict):
         return cls(
