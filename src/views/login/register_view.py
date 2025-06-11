@@ -52,21 +52,12 @@ class RegisterView:
             access_level= access_level,
             fullname= fullname
         )
-        match register_result:
-            case RegisterCases.INVALID_PASSWORD:
-                self.page.open(custom_snack_bar(content= 'Contraseña no válida'))
-            case RegisterCases.USERNAME_TAKEN:
-                self.page.open(custom_snack_bar(content= 'Nombre de usuario no disponible'))
-            case RegisterCases.EMPTY_INPUT:
-                self.page.open(custom_snack_bar(content= 'Rellene los campos'))
-            case RegisterCases.INVALID_EMAIL:
-                self.page.open(custom_snack_bar(content= 'Correo electrónico no válido'))
-            case RegisterCases.INVALID_ACCESS_LEVEL:
-                self.page.open(custom_snack_bar(content= 'Nivel de acceso no válido'))
-            case RegisterCases.CORRECT:
-                self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
-                self._close_view()
-        return
+        if register_result == RegisterCases.CORRECT:
+            self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
+            self._close_view()
+            return
+        else:
+            self.page.open(custom_snack_bar(content= str(register_result.value)))
 
     email_text_field = CustomTextField(
         hint_label= "Correo electrónico",

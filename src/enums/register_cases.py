@@ -1,9 +1,14 @@
 from enum import Enum
 
-class RegisterCases(Enum):
-    CORRECT = 0,
-    INVALID_PASSWORD = 1,
-    USERNAME_TAKEN = 2,
-    EMPTY_INPUT = 3,
-    INVALID_EMAIL = 4,
-    INVALID_ACCESS_LEVEL = 5,
+class RegisterCases(str, Enum):
+    CORRECT = "Registro realizado exitosamente",
+    INVALID_PASSWORD = "Contraseña no válida",
+    INVALID_EMAIL = "Correo no válido",
+    INVALID_ACCESS_LEVEL = "Nivel de acceso no existente/válido",
+    USERNAME_TAKEN = "Nombre de usuario ocupado",
+    EMAIL_TAKEN = "Correo electrónico ocupado",
+    EMPTY_INPUT = "Rellene los campos",
+
+if __name__ == '__main__':
+    print(RegisterCases.CORRECT.value)
+    print(RegisterCases.CORRECT)
