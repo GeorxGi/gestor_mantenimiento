@@ -6,7 +6,11 @@ from src.enums.access_level import AccessLevel
 class Technician(User):
     def __init__(self, *, working_area:str = '', **kwargs):
         super().__init__(**kwargs)
-        self.working_area = working_area
+        self.asigned_work_id:str = ''
+        self.working_area:str = working_area
+
+    def asign_work(self, work_id:str):
+        self.asigned_work_id = work_id
 
     @classmethod
     def from_dict(cls, data:dict):

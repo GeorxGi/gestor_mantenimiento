@@ -39,7 +39,7 @@ def is_valid_mail(email:str) -> bool:
         return True
     return False
 
-def _create_user_from_dict(user_dict:dict):
+def _create_user_from_dict(user_dict:dict) -> Technician | Supervisor | Admin | None:
     """Crea una instancia de usuario en base a los datos ingresados"""
     match AccessLevel.from_string(str(user_dict.get("access_level", ""))):
         case AccessLevel.TECHNICIAN:
