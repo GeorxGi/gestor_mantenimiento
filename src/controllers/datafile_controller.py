@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+from src.enums.access_level import AccessLevel
 
 class DataFileController:
     _BASE_DIR:Path = Path(__file__).parent.parent / "data"
@@ -7,6 +8,7 @@ class DataFileController:
 
     REGISTERED_USERS:Path = _BASE_DIR / "registered_users.json"
     MAINTENANCES:Path = _BASE_DIR / "pending_maintenances.json"
+    EQUIPMENTS:Path = _BASE_DIR / "equipments.json"
 
 #--------------------------- LECTURA ARCHIVOS ---------------------------
     @staticmethod
@@ -22,7 +24,15 @@ class DataFileController:
     def read_users():
         """Metodo en el que se puede iterar para lectura de datos de usuarios"""
         yield from DataFileController.__read_file(DataFileController.REGISTERED_USERS)
+    @staticmethod
+    def read_users_by_access_level(access_level:AccessLevel):
+        for usr in DataFileController.read_users():
+            if AccessLevel.from_string(usr.get("access_level", "")) == access_level:
+                yield usr
 
+    @staticmethod
+    def read_equipments():
+        yield from DataFileController.__read_file(DataFileController.EQUIPMENTS)
     @staticmethod
     def read_maintenances():
         yield from DataFileController.__read_file(DataFileController.MAINTENANCES)
@@ -30,10 +40,8 @@ class DataFileController:
 #--------------------------- ACTUALIZACIÓN ARCHIVOS ---------------------------
 
     @staticmethod
-    def __update_file(*, to_read_file:Path, primary_key_name:str, primary_key_value, key_to_update: str, new_value):
+    def __update_file(*, to_read_file:Path, primary_key_name:str, primary_key_value, key_to_update: str, new_value, excluded_attributes:set[str]) -> bool:
         """Busca un registro por ID y modifica un único atributo."""
-        excluded_attributes = {"id", "password", "access_level"}
-
         try:
             with open(to_read_file, 'r') as file:
                 data = json.load(file)
@@ -50,6 +58,7 @@ class DataFileController:
                 with open(to_read_file, 'w') as file:
                     json.dump(data, file, indent=4)  # Guarda los cambios
                 return True
+            return False
 
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error al actualizar archivo {to_read_file}: {e}")
@@ -57,18 +66,30 @@ class DataFileController:
         return False  # Si el usuario no fue encontrado o la clave no era válida
 
     @staticmethod
-    def update_user(user_id:str, key:str, new_value):
-        DataFileController.__update_file(
+    def update_user(user_id:str, key:str, new_value) -> bool:
+        return DataFileController.__update_file(
             to_read_file= DataFileController.REGISTERED_USERS,
             primary_key_name= "id",
             primary_key_value= user_id,
             key_to_update= key,
-            new_value= new_value
+            new_value= new_value,
+            excluded_attributes= {"id", "password", "access_level"}
+        )
+
+    @staticmethod
+    def update_equipment(equipment_id:str, key:str, new_value) -> bool:
+        return DataFileController.__update_file(
+            to_read_file= DataFileController.EQUIPMENTS,
+            primary_key_name= "id",
+            primary_key_value= equipment_id,
+            key_to_update= key,
+            new_value= new_value,
+            excluded_attributes= {"id"}
         )
 #--------------------------- ADICIÓN ARCHIVOS ---------------------------
 
     @staticmethod
-    def __add_to_file(file_path:Path, new_entry:dict):
+    def __add_to_file(file_path:Path, new_entry:dict) -> bool:
         try:
             if not file_path.exists(): #Si el archivo no existe, lo crea vacio rapidamente
                 with open(file_path, 'w') as file:
@@ -90,15 +111,31 @@ class DataFileController:
             return False
 
     @staticmethod
-    def add_new_user(new_user:dict):
+    def add_new_user(new_user:dict) -> bool:
         return DataFileController.__add_to_file(
             DataFileController.REGISTERED_USERS,
             new_user
         )
 
+    @staticmethod
+    def add_new_equipment(new_equipment:dict) -> bool:
+        return DataFileController.__add_to_file(
+            DataFileController.EQUIPMENTS,
+            new_equipment
+        )
+
+    @staticmethod
+    def add_new_maintenance(new_maintenance:dict) -> bool:
+        return DataFileController.__add_to_file(
+            DataFileController.MAINTENANCES,
+            new_maintenance
+        )
+
+#--------------------------- PRUEBAS UNITARIAS ---------------------------
+
 if __name__ == '__main__':
-    DataFileController.update_user(
-        user_id="f70b82d0-5a56-498b-ab3f-6d6fc488b99c",
-        key= "access",
-        new_value= "ADMIN"
-    )
+    print (DataFileController.update_user(
+        user_id="459f7897-b6f5-4309-a80b-75ec16c1c386",
+        key= "fullname",
+        new_value= "Jose Juan"
+    ) )
