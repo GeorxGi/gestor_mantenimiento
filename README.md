@@ -2,6 +2,8 @@
 
 Aplicación que permite a una empresa la gestión de inventario y el mantenimiento programado de sus equipos.
 
+## Requisitos
+* Python 3.13 o superior (cualquier versión distinta a esta podría tener comportamientos indeseados)
 
 ## Ejecutar localmente
 
@@ -23,7 +25,10 @@ python -m venv venv
 ```bash
 venv\Scripts\activate
 ```
-* Una vez realizado todo esto, en la terminar deberías ver un (venv) en el inicio
+* Una vez realizado todo esto, se debería poder apreciar un prefijo (venv) en el inicio de la caja de comandos, por ejemplo:
+```bash
+(venv) my_directory/local_repo> 
+```
 
 * Para instalar las dependencias del proyecto utiliza el comando.
 
