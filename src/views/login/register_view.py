@@ -1,48 +1,73 @@
 import flet as ft
-from src.utils.routes import register_view
+
+from src.enums.access_level import AccessLevel
+from src.enums.register_cases import RegisterCases
 
 from src.widgets.gradient_text import gradient_text
 from src.widgets.custom_text_field import CustomTextField
 from src.widgets.gradient_button import gradient_button
+from src.widgets.custom_snack_bar import custom_snack_bar
+from src.utils.routes import register_view
+
 from src.consts.colors import gradient_colors
 from src.controllers.user.session_controller import register_user
 
-@register_view("/register")
+@register_view('/register')
 class RegisterView:
     def __init__(self, page: ft.Page):
         self.page = page
+
+    def _close_view(self):
+        self._reset_fields()
+        self.page.views.pop()
+        self.page.update()
+
+    def _reset_fields(self):
+        self.username_text_field.value = ''
+        self.password_text_field.value = ''
+        self.email_text_field.value = ''
+        self.access_level_DropDown.value = None
     
     def _register(self):
         email = self.email_text_field.value
+        fullname = self.fullname_text_field.value
         username = self.username_text_field.value
         password = self.password_text_field.value
-        access_level = self.access_level_DropDown.value
         agreement = self.CheckBox_Agreement.value
-        
-        if not email or not username or not password or not access_level:
-            self.page.open(
-                self.local_snack_bar('Rellene los campos')
-            )
+
+        #este pequeño bloque es para parsear
+        if self.access_level_DropDown.value is not None:
+            access_level = AccessLevel(int(self.access_level_DropDown.value))
+        else:
+            access_level = None
+
+        if not agreement:
+            self.page.open(custom_snack_bar(content= 'Debe aceptar los términos y condiciones'))
             return
-        if agreement == False:
-            self.page.open(
-                self.local_snack_bar('Debe aceptar los términos y condiciones')
-            )
+
+        register_result = register_user(
+            username=username,
+            password=password,
+            email= email,
+            access_level= access_level,
+            fullname= fullname
+        )
+        if register_result == RegisterCases.CORRECT:
+            self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
+            self._close_view()
             return
-        
-    def local_snack_bar(error:str)-> ft.SnackBar:
-        return ft.SnackBar(
-        bgcolor= ft.Colors.BLUE,
-        content= ft.Text(
-            value= error,
-            color= ft.Colors.WHITE
-        ),
-    )
-        
+        else:
+            self.page.open(custom_snack_bar(content= str(register_result.value)))
+
     email_text_field = CustomTextField(
         hint_label= "Correo electrónico",
         width= 350,
         icon= ft.Icons.EMAIL
+    )
+    fullname_text_field = CustomTextField(
+        hint_label= 'Nombre completo',
+        width= 350,
+        icon= ft.Icons.PERSON
     )
     username_text_field = CustomTextField(
         hint_label= "Usuario",
@@ -60,9 +85,9 @@ class RegisterView:
         hint_text= "Nivel de acceso",
         leading_icon=ft.Icon(ft.Icons.SUPERVISOR_ACCOUNT),
         options= [
-            ft.dropdown.Option("Supervisor"),
-            ft.dropdown.Option("Administrador"),
-            ft.dropdown.Option("Usuario"),
+            ft.dropdown.Option(text= "Administrador", key= AccessLevel.ADMIN.value),
+            ft.dropdown.Option(text="Supervisor", key= AccessLevel.SUPERVISOR.value),
+            ft.dropdown.Option(text= "Técnico", key= AccessLevel.TECHNICIAN.value),
         ],
         color= ft.Colors.GREY_500,
         border_color= ft.Colors.GREY_300,
@@ -99,6 +124,7 @@ class RegisterView:
                         color= ft.Colors.GREY_500,
                     ),
                 ),
+                fullname_text_field,
                 email_text_field,
                 username_text_field,
                 password_text_field,
@@ -108,36 +134,33 @@ class RegisterView:
     )
     
     CheckBox_Agreement =  ft.CupertinoCheckbox(
-                        value= False,
-                        active_color="#8855ff"
-                    )
+        value= False,
+        active_color="#8855ff",
+    )
     
-    Agreement = ft.Column(
+    Agreement = ft.Row(
+        vertical_alignment= ft.CrossAxisAlignment.CENTER,
+        alignment= ft.MainAxisAlignment.CENTER,
         controls= [
-            ft.Row(
-                controls= [
-                    CheckBox_Agreement,
-                    ft.Text(
-                        value= "",
-                        spans=[
-                            ft.TextSpan(
-                                text= "Acepto los ",
-                                style=ft.TextStyle(
-                                    size=16,
-                                    color=ft.Colors.GREY_500,
-                                ),
-                            ),
-                            ft.TextSpan(
-                                text= "términos y condiciones",
-                                url= "https://www.macroplastics.com/images/docs/Terminos-y-Condiciones-de-Venta.pdf",
-                                style=ft.TextStyle(
-                                    size=16,
-                                    color=ft.Colors.BLUE
-                                ),
-                            ),
-                        ]
+            CheckBox_Agreement,
+            ft.Text(
+                spans=[
+                    ft.TextSpan(
+                        text= "Acepto los ",
+                        style=ft.TextStyle(
+                            size=16,
+                            color=ft.Colors.GREY_500,
+                        ),
                     ),
-                ],
+                    ft.TextSpan(
+                        text= "términos y condiciones",
+                        url= "https://www.macroplastics.com/images/docs/Terminos-y-Condiciones-de-Venta.pdf",
+                        style=ft.TextStyle(
+                            size=16,
+                            color=ft.Colors.BLUE
+                        ),
+                    ),
+                ]
             ),
         ],
     )
@@ -158,9 +181,7 @@ class RegisterView:
                     color= ft.Colors.GREY,
                 ),
                 self._main_view_container,
-                ft.Container(
-                    agreement := self.Agreement,
-                ),
+                self.Agreement,
                 gradient_button(
                     text= "Continuar",
                     width= 300,
@@ -178,6 +199,7 @@ if __name__ == '__main__':
         page.title= "Register (DEBUG MODE)"
         page.window.resizable = True
         page.window.width = 500
+        page.window.height = 900
         page.theme_mode = ft.ThemeMode.LIGHT
         page.vertical_alignment = ft.MainAxisAlignment.CENTER
         page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
@@ -187,10 +209,3 @@ if __name__ == '__main__':
     ft.app(
         target=test_register_page
     )
-
-        
-        
-        
-    
-        
-        
