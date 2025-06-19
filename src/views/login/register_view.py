@@ -209,10 +209,3 @@ if __name__ == '__main__':
     ft.app(
         target=test_register_page
     )
-
-        
-        
-        
-    
-        
-        
