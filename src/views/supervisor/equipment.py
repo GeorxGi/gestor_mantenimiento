@@ -1,25 +1,43 @@
 import flet as ft
 
 class inputForm(ft.TextField):
-    def __init__(self, label: str, icon: str, height):
+    def __init__(self, label: str, icon: str, ):
         super().__init__()
         self.label = label
         self.icon = icon
         self.width = 300
-        self.height = height
         if label == "descripcion":
             self.multiline = True
             self.min_lines = 3
             self.max_lines = 5
             
 def equipment_form(page: ft.Page):
-    return ft.Column(
-        [
-            ft.Text("Agregar equipo", size=50), 
-            inputForm("codigo", ft.Icons.QR_CODE_2, 100),
-            inputForm("nombre", ft.Icons.AIRPORT_SHUTTLE, 100),
-            inputForm("descripcion", ft.Icons.ASSIGNMENT, 500),
-            inputForm("proveedor", ft.Icons.STORE, 100)
-        ]
+    
+    container_form = ft.Container(
+        width= 400,
+        height= 400,
+        bgcolor= ft.Colors.WHITE,
+        border_radius= 20,
+        content= ft.Column(
+            alignment= ft.MainAxisAlignment.CENTER,
+            horizontal_alignment= ft.CrossAxisAlignment.CENTER,
+            controls= [
+                ft.Text("Agregar equipo", 
+                        size= 30,
+                        weight= ft.FontWeight.BOLD,
+                        color= ft.Colors.GREY_700
+                        ),
+                inputForm("codigo", ft.Icons.QR_CODE_2),
+                inputForm("nombre", ft.Icons.AIRPORT_SHUTTLE),
+                inputForm("descripcion", ft.Icons.ASSIGNMENT),
+                inputForm("proveedor", ft.Icons.STORE)
+            ],
+        )
+    )
+    
+    return ft.Container(
+        content= container_form,
+        alignment=ft.alignment.center,
+        expand=True
     )
 

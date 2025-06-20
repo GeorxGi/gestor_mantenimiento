@@ -54,7 +54,7 @@ class SupervisorView:
                 ),
                 alignment=ft.alignment.center,
                 width=350,
-                height=250,
+                height=300,
                 padding=10,
             ),
             # esto evita que al tocar afuera del bottonsheet se cierra
