@@ -2,13 +2,16 @@ import flet as ft
 from src.utils.routes import register_view
 
 from src.views.supervisor.equipment import equipment_form
+from src.views.supervisor.maintenance import maintenance_form
+from src.views.supervisor.piece import piece_form
+
 from src.views.supervisor.inventory_view import inventory
 from src.views.supervisor.profile_view import profile_set
 
 
 from src.consts.colors import purple_color,blue_color
 from src.widgets.gradient_text import gradient_text
-from src.consts.colors import gradient_colors
+from src.consts.colors import gradient_colors,middle_color
 
 class ButtonsAdd(ft.ElevatedButton):
     def __init__(self, text, on_click_event):
@@ -17,7 +20,7 @@ class ButtonsAdd(ft.ElevatedButton):
                                color=ft.Colors.WHITE,
                                size=15)
         self.on_click = on_click_event
-        self.bgcolor = ft.Colors.BLUE
+        self.bgcolor = middle_color
         self.color = ft.Colors.WHITE
         self.width = 250
 
@@ -33,6 +36,20 @@ class SupervisorView:
             self.content_area.controls.append(equipment_form(self.page))
             self.content_area.update()
             self.page.update()
+            
+        def navigate_to_maintenance(page: ft.Page):
+            self.page.close(self.add_options)
+            self.content_area.controls.clear()
+            self.content_area.controls.append(maintenance_form(self.page))
+            self.content_area.update()
+            self.page.update()
+        
+        def navigate_to_piece(page: ft.Page):
+            self.page.close(self.add_options)
+            self.content_area.controls.clear()
+            self.content_area.controls.append(piece_form(self.page))
+            self.content_area.update()
+            self.page.update()
         
         self.add_options = ft.BottomSheet(
             ft.Container(
@@ -43,11 +60,11 @@ class SupervisorView:
                                 weight=ft.FontWeight.BOLD,
                                 size=25),
                         ButtonsAdd("Equipo", on_click_event=lambda _: navigate_to_equipment(page)),
-                        ButtonsAdd("Orden de mantenimiento", on_click_event=lambda _: print("Evento de orden de mantenimiento")),
-                        ButtonsAdd("Solicitud de pieza", on_click_event=lambda _: print("Evento de solicitud de pieza")),
+                        ButtonsAdd("Orden de mantenimiento", on_click_event=lambda _: navigate_to_maintenance(page)),
+                        ButtonsAdd("Solicitud de pieza", on_click_event=lambda _: navigate_to_piece(page)),
                         ft.IconButton(ft.Icons.CLOSE,
                                       on_click=lambda _: self.close_add_options(),
-                                      icon_color=ft.Colors.RED)
+                                      icon_color=ft.Colors.GREY_500)
                     ], 
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                     spacing=10
@@ -85,18 +102,18 @@ class SupervisorView:
                 ft.NavigationBarDestination(
                     icon=ft.Container(
                         content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
-                        bgcolor=ft.Colors.BLUE,
+                        bgcolor= middle_color,
                         border_radius=20,
                         width=60,
-                        height=40,
+                        height=35,
                         alignment=ft.alignment.center
                     ),
                     selected_icon=ft.Container(
                         content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
-                        bgcolor=ft.Colors.BLUE_700,
+                        bgcolor=middle_color,
                         border_radius=20,
                         width=60,
-                        height=40,
+                        height=35,
                         alignment=ft.alignment.center
                     ),
                     label="Agregar"
@@ -142,6 +159,9 @@ class SupervisorView:
         self.content_area.update()
     
     def build(self):
+        # Configurar para evitar redimensionamiento con teclado
+        self.page.window.prevent_close = False
+        
         return ft.View(
             # este appbar puede ser global para todas las vistas de nivel de acceso
             appbar= ft.AppBar(
@@ -181,6 +201,7 @@ if __name__ == '__main__':
         page.title= "Supervisor (DEBUG MODE)"
         page.window.resizable = True
         page.window.width = 500
+        page.window.height =900
         page.theme_mode = ft.ThemeMode.LIGHT
         page.vertical_alignment = ft.MainAxisAlignment.CENTER
         page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
