@@ -3,7 +3,7 @@ from src.utils.routes import register_view
 
 from src.widgets.gradient_button import gradient_button
 from src.widgets.gradient_text import gradient_text
-from src.consts.colors import gradient_colors, purple_color
+from src.consts.colors import gradient_colors, purple_color, middle_color
 
 @register_view('/')
 class WelcomePage:
@@ -32,10 +32,22 @@ class WelcomePage:
                             size= 80,
                             gradient= gradient_colors,
                         ),
+                        
+                        ft.Text(
+                            "Bienvenido!",
+                            size= 20,
+                            color= ft.Colors.GREY_700
+                        ),
                         ft.Container(
-                            border_radius= ft.border_radius.all(20),
-                            height=300,
-                            bgcolor= purple_color,
+                            content=ft.Image(
+                                src= 'https://acortar.link/Y6WaMj',
+                                width= 200,
+                                height= 200,
+                                border_radius=20
+                            ),
+                            border_radius= 20,
+                            bgcolor= middle_color,
+                            padding= ft.padding.all(5)
                         ),
                         gradient_button(
                             on_click= lambda e: self._go_to_login(),
@@ -47,14 +59,17 @@ class WelcomePage:
                         ft.OutlinedButton(
                             content= gradient_text(text='Registrarse', gradient=gradient_colors, size=20),
                             on_click= lambda e: self._go_to_register(),
-                            width= 350,
+                            width= 300,
                             height= 48,
                             icon_color= ft.Colors.WHITE,
-                            style= ft.ButtonStyle( side= ft.BorderSide(2, ft.Colors.BLUE_400),) #Borde del boton
+                            style= ft.ButtonStyle( side= ft.BorderSide(2, ft.Colors.GREY_300),) #Borde del boton
                         ),
                     ]
                 )
-            ]
+            ],
+            horizontal_alignment= ft.CrossAxisAlignment.CENTER,
+            vertical_alignment= ft.MainAxisAlignment.CENTER,
+            bgcolor= ft.Colors.GREY_100
         )
 
 
