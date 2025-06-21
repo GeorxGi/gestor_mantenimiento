@@ -1,5 +1,6 @@
 import flet as ft 
-from src.consts.colors import blue_color, purple_color
+from src.consts.colors import middle_color
+
 
 def inventory(page: ft.Page):
     
@@ -11,7 +12,7 @@ def inventory(page: ft.Page):
                         border_radius= ft.border_radius.all(30),
                         border_color=ft.Colors.GREY_300),
             ft.IconButton(
-                bgcolor= ft.Colors.BLUE,
+                bgcolor= middle_color,
                 icon_color=ft.Colors.WHITE,
                 icon= ft.Icons.FILTER_LIST,
                 on_click= lambda e: print("despliega ventana emergente o menu para filtrar...")
