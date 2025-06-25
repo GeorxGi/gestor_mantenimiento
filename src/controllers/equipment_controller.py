@@ -1,45 +1,33 @@
-import uuid
-
+from src.controllers.sql.equipment_sql import EquipmentSQL
 from src.models.equipment import Equipment
-from src.controllers.datafile_controller import DataFileController
 
-def equipment_exist(equipment_id:str) -> bool:
-    for equip in DataFileController.read_equipments():
-        if equip.get("id") == equipment_id:
-            return True
-    return False
-
-def create_equipment(*, name:str, description:str, provider:str) -> bool:
-    if not name or not description or not provider:
+def create_equipment(*, code:str, name:str, description:str, provider:str) -> bool:
+    if not code or not name or not description or not provider:
         return False
 
-    new_equipment = Equipment(
-        maintenance_id= "",
-        name= name,
-        description= description,
-        provider= provider,
-        id= str(uuid.uuid4())
-    )
-    DataFileController.add_new_equipment(new_equipment.__dict__)
-
-    return True
-
-def asign_maintenance_to_equipment(equipment_id:str, maintenance_id:str) -> bool:
-    if not equipment_id or not maintenance_id:
+    is_valid_code = len(code) == 6 and code.isalnum()
+    if not is_valid_code:
         return False
 
-    for equip in DataFileController.read_equipments():
-        if equip.get("id", "") == equipment_id:
-            #Valida que el equipo ingresado no tenga un mantenimiento ya registrado
-            if equip.get("maintenance_id", "") != "":
-                return False
+    with EquipmentSQL() as db:
+        return db.create_equipment(
+            code= code,
+            name=name,
+            description=description,
+            provider=provider
+        )
 
-    response = DataFileController.update_equipment(
-        equipment_id= equipment_id,
-        new_value= maintenance_id,
-        key= "maintenance_id"
-    )
-    return response
+def equipment_exists(equipment_code:str) -> bool:
+    with EquipmentSQL() as db:
+        return True if db.fetch_equipment_data(equipment_code) else False
+
+def get_equipment(equipment_code:str) -> Equipment | None:
+    with EquipmentSQL() as db:
+        value = db.fetch_equipment_data(equipment_code)
+        return Equipment.from_dict(value) if value else None
 
 if __name__ == '__main__':
-    pass
+    print(equipment_exists("a16ebe3c-3efe-43ac-817a-15a83ef54e04"))
+
+    equip = get_equipment("c5bdd09a-807b-4dbe-897d-1461090493d3")
+    print(f"{equip.name} - {equip.description} - {equip.provider} - {equip.code}")
