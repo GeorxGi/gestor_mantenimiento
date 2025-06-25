@@ -2,14 +2,13 @@
 # MANEJO DE REGISTRO DE USUARIO, GUARDARLO EN ARCHIVOS .JSON
 # BUSQUEDA Y LOGIN DE USUARIO
 #
-from src.controllers.datafile_controller import DataFileController
+from src.controllers.sql.user_sql import UserSQL
 from src.controllers.user.user_controller import password_is_secure, _create_user_from_dict, is_valid_mail
 from src.utils.encrypter import compare_hashed, hash_password
 from src.enums.register_cases import RegisterCases
 
 from src.enums.access_level import AccessLevel
 
-#metodo en el que se añadirá la lógica de registro de usuarios,
 def register_user(*, fullname:str, username:str, password:str, email: str, access_level:AccessLevel) -> RegisterCases:
     """Recibe los datos de un usuario, y si todas las validaciones son correctas,
     lo almacena localmente, si no, retorna un enum RegisterCase con el error ocurrido"""
@@ -29,15 +28,16 @@ def register_user(*, fullname:str, username:str, password:str, email: str, acces
     if _username_is_taken(username):  # Si el usuario ya existe, no se puede registrar
         return RegisterCases.USERNAME_TAKEN
 
-    user_dict = {
-        "fullname": fullname,
-        "username": username,
-        "password": hash_password(password),
-        "email": email,
-        "access_level": access_level.name
-    }
-    new_user = _create_user_from_dict(user_dict)
-    DataFileController.add_new_user(new_user.to_dict()) # Guardar el usuario en el archivo
+    hashed_password = hash_password(password)
+
+    with UserSQL() as db:
+        db.create_user(
+            username= username,
+            password= hashed_password,
+            email= email,
+            access_level= access_level,
+            fullname= fullname
+        )
     return RegisterCases.CORRECT
 
 #Metodo en el que se añadirá la logica de inicio de sesión
@@ -45,22 +45,26 @@ def login_user(*, username:str, password:str):
     """Metodo encargado del proceso de login,
     retorna un objeto usuario en caso de un proceso exitoso,
     por el contrario, retornará None"""
-    for user in DataFileController.read_users():
-        if user["username"] != username:
-            continue
-        else:
-            if compare_hashed(user["password"], password):
-                return _create_user_from_dict(user)
-            else:
-                break
-    return None
+    if not username or not password:
+        return None
 
-def _username_is_taken(username:str):
+    with UserSQL() as db:
+        login_user_data = db.login_fetch(username)
+
+    if not login_user_data:
+        return None
+
+    user_password = login_user_data.get("password", "")
+    if not compare_hashed(password, user_password):
+        return None
+    with UserSQL() as db:
+        logged_user = db.fetch_by_username(username)
+    return _create_user_from_dict(logged_user)
+
+def _username_is_taken(username:str) -> bool:
     """Recibe un username e indica si existe algún usuario registrado con este mismo nombre de usuario"""
-    for user in DataFileController.read_users():
-        if user["username"] == username:
-            return True
-    return False
+    with UserSQL() as db:
+        return True if db.fetch_by_username(username) else False
 
 if __name__ == '__main__': #Prueba cerrada
     print(register_user(
@@ -71,7 +75,7 @@ if __name__ == '__main__': #Prueba cerrada
         email= 'correoPaProbar@gmail.com',
     ).value)
 
-    user = login_user(username='UsuarioPrueba1',password='Clavesegura123')
+    user = login_user(username='test_user',password='Clavesegura123')
 
     if user is None:
         print('Registrando usuario')

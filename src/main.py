@@ -1,5 +1,8 @@
 import flet as ft
+from controllers.sql.base_sql import BaseSqlController
+
 def main(page: ft.Page):
+    BaseSqlController.init_db()
     page.title= 'Gestor mantenimiento'
     page.theme_mode = ft.ThemeMode.LIGHT
     page.window.width = 500
