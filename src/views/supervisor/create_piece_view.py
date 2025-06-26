@@ -5,7 +5,10 @@ from src.widgets.input_form import input_form
 
 from src.consts.colors import gradient_colors, middle_color
 
-def piece_form(page:ft.Page):
+def create_piece_view(page:ft.Page, on_sucess=None):
+    code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2),
+    quantity_input = input_form(label="Cantidad", icon=ft.Icons.NUMBERS),
+
     title_form = ft.Column(
         controls = [
             ft.Icon(
@@ -13,11 +16,12 @@ def piece_form(page:ft.Page):
                 size= 80,
                 color= middle_color
                 ),
-            ft.Text("Agregar solicitud de pieza",
-                    size= 25,
-                    weight= ft.FontWeight.BOLD,
-                    color= ft.Colors.GREY_700
-                    ),
+            ft.Text(
+                value="Agregar solicitud de pieza",
+                size= 25,
+                weight= ft.FontWeight.BOLD,
+                color= ft.Colors.GREY_700
+            ),
             ft.Divider(height= 15, color= ft.Colors.GREY_300),
         ],
         alignment= ft.MainAxisAlignment.CENTER,
@@ -50,8 +54,8 @@ def piece_form(page:ft.Page):
             controls=[
                 title_form,
                 container_img_piece,
-                input_form(label="Codigo", icon=ft.Icons.QR_CODE_2),
-                input_form(label="Cantidad", icon=ft.Icons.NUMBERS),
+                code_input,
+                quantity_input,
             ]
         )
     )

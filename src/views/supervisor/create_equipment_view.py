@@ -1,11 +1,33 @@
 import flet as ft
 
+from src.enums.create_equipment_cases import CreateEquipmentCases
+from src.widgets.custom_snack_bar import custom_snack_bar
 from src.widgets.gradient_button import gradient_button
 from src.widgets.input_form import input_form
 
 from src.consts.colors import gradient_colors, middle_color
+
+from src.controllers.equipment_controller import create_equipment
             
-def equipment_form(page: ft.Page):
+def create_equipment_view(page: ft.Page, on_success = None):
+    name_input = input_form(label="Nombre", icon=ft.Icons.CREATE)
+    code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2)
+    description_input = input_form(label="Descripcion", icon=ft.Icons.ASSIGNMENT)
+    provider_input = input_form(label="Proveedor", icon=ft.Icons.STORE)
+
+    def register_equipment():
+        response = create_equipment(
+            name= name_input.value,
+            description= description_input.value,
+            provider= provider_input.value,
+            code= code_input.value
+        )
+        if response == CreateEquipmentCases.CORRECT:
+            if on_success:
+                on_success()
+        else:
+            page.open(custom_snack_bar(content= str(response.value)))
+
     title_form = ft.Column(
         controls= [
             # main_img,
@@ -14,11 +36,12 @@ def equipment_form(page: ft.Page):
                 size= 80,
                 color= middle_color
             ),
-            ft.Text("Agregar equipo",
-                    size= 25,
-                    weight= ft.FontWeight.BOLD,
-                    color= ft.Colors.GREY_700
-                    ),
+            ft.Text(
+                value="Agregar equipo",
+                size= 25,
+                weight= ft.FontWeight.BOLD,
+                color= ft.Colors.GREY_700
+            ),
             ft.Divider(height= 15, color= ft.Colors.GREY_300),
         ],
         alignment= ft.MainAxisAlignment.CENTER,
@@ -37,14 +60,13 @@ def equipment_form(page: ft.Page):
             horizontal_alignment= ft.CrossAxisAlignment.CENTER,
             controls= [
                 title_form,
-                input_form(label="Codigo", icon=ft.Icons.QR_CODE_2),
-                input_form(label="Nombre", icon=ft.Icons.CREATE),
-                input_form(label="Descripcion", icon=ft.Icons.ASSIGNMENT),
-                input_form(label="Proveedor", icon=ft.Icons.STORE)
+                code_input,
+                name_input,
+                description_input,
+                provider_input,
             ],
         )
     )
-    
     return ft.Container(
         content= ft.Column(
             controls=[
@@ -54,7 +76,7 @@ def equipment_form(page: ft.Page):
                     width=300,
                     height=48,
                     gradient= gradient_colors,
-                    on_click= lambda e: print('guarda equipo'),
+                    on_click= lambda e: register_equipment()
                 ),
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,

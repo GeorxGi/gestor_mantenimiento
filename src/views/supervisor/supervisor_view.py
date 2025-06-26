@@ -1,15 +1,14 @@
 import flet as ft
 from src.utils.routes import register_view
 
-from src.views.supervisor.equipment import equipment_form
-from src.views.supervisor.maintenance import maintenance_form
-from src.views.supervisor.piece import piece_form
+from src.views.supervisor.create_equipment_view import create_equipment_view
+from src.views.supervisor.create_maintenance_view import create_maintenance_view
+from src.views.supervisor.create_piece_view import create_piece_view
 
 from src.views.supervisor.inventory_view import inventory
 from src.views.supervisor.profile_view import profile_set
+from src.widgets.custom_snack_bar import custom_snack_bar
 
-
-from src.consts.colors import purple_color,blue_color
 from src.widgets.gradient_text import gradient_text
 from src.consts.colors import gradient_colors,middle_color
 
@@ -24,47 +23,41 @@ class ButtonsAdd(ft.ElevatedButton):
         self.color = ft.Colors.WHITE
         self.width = 250
 
-
+@register_view('supervisor_view')
 class SupervisorView:
     def __init__(self, page: ft.Page):
         self.page = page
         self.last_selected_index = 0
-        
-        def navigate_to_equipment(page: ft.Page):
+
+        def close_control_view():
+            self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
+            self.last_selected_index = 0
+            self.close_add_options()
+
+        def navigate_to(view_factory):
             self.page.close(self.add_options)
             self.content_area.controls.clear()
-            self.content_area.controls.append(equipment_form(self.page))
+            self.content_area.controls.append(view_factory(self.page, on_success= close_control_view))
             self.content_area.update()
             self.page.update()
-            
-        def navigate_to_maintenance(page: ft.Page):
-            self.page.close(self.add_options)
-            self.content_area.controls.clear()
-            self.content_area.controls.append(maintenance_form(self.page))
-            self.content_area.update()
-            self.page.update()
-        
-        def navigate_to_piece(page: ft.Page):
-            self.page.close(self.add_options)
-            self.content_area.controls.clear()
-            self.content_area.controls.append(piece_form(self.page))
-            self.content_area.update()
-            self.page.update()
-        
+
         self.add_options = ft.BottomSheet(
             ft.Container(
                 ft.Column(
-                    [
-                        ft.Text("Agregar...", 
-                                color=ft.Colors.GREY_500,
-                                weight=ft.FontWeight.BOLD,
-                                size=25),
-                        ButtonsAdd("Equipo", on_click_event=lambda _: navigate_to_equipment(page)),
-                        ButtonsAdd("Orden de mantenimiento", on_click_event=lambda _: navigate_to_maintenance(page)),
-                        ButtonsAdd("Solicitud de pieza", on_click_event=lambda _: navigate_to_piece(page)),
-                        ft.IconButton(ft.Icons.CLOSE,
-                                      on_click=lambda _: self.close_add_options(),
-                                      icon_color=ft.Colors.GREY_500)
+                    controls= [
+                        ft.Text(
+                            value="Agregar...",
+                            color=ft.Colors.GREY_500,
+                            weight=ft.FontWeight.BOLD,
+                            size=25),
+                        ButtonsAdd(text= "Equipo", on_click_event= lambda _: navigate_to(create_equipment_view)),
+                        ButtonsAdd(text= "Orden de mantenimiento", on_click_event= lambda _: navigate_to(create_maintenance_view)),
+                        ButtonsAdd(text= "Solicitud de pieza", on_click_event= lambda _: navigate_to(create_piece_view)),
+                        ft.IconButton(
+                            ft.Icons.CLOSE,
+                            on_click=lambda _: self.close_add_options(),
+                            icon_color=ft.Colors.GREY_500
+                        )
                     ], 
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                     spacing=10
@@ -81,10 +74,10 @@ class SupervisorView:
         )
     
         self.content_area = ft.Column(
-                controls=[],
-                expand=True,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=10,
+            controls=[],
+            expand=True,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=10,
         )
         self.content_area.controls.append(inventory(self.page))
         
@@ -163,6 +156,7 @@ class SupervisorView:
         self.page.window.prevent_close = False
         
         return ft.View(
+            route= 'supervisor_view',
             # este appbar puede ser global para todas las vistas de nivel de acceso
             appbar= ft.AppBar(
                 automatically_imply_leading=False,
@@ -187,8 +181,6 @@ class SupervisorView:
                 ]
             ),
             bottom_appbar= self.navigation_bar,
-
-            route= '/supervisor',
             controls= [
                 self.content_area
             ],
