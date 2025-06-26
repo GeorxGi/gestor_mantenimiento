@@ -28,18 +28,22 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
     with UserSQL() as db:
         in_db_technicians = db.fetchall_by_id(asigned_technicians_id)
 
-        if len(in_db_technicians) != len(asigned_technicians_id):
-            return CreateMaintenanceCases.NOT_REGISTERED_ID
+    for technician in in_db_technicians:
+        if technician.get("assigned_maintenance_id", "") != "":
+            return CreateMaintenanceCases.BUSY_TECHNICIAN
 
-        for technician in in_db_technicians:
-            technician_access_level = AccessLevel.from_string(technician.get("access_level", ""))
-            if technician_access_level != AccessLevel.TECHNICIAN:
-                return CreateMaintenanceCases.TECHNICIAN_ID_IS_NOT_TECHNICIAN
+        technician_access_level = AccessLevel.from_string(technician.get("access_level", ""))
+        if technician_access_level != AccessLevel.TECHNICIAN:
+            return CreateMaintenanceCases.TECHNICIAN_ID_IS_NOT_TECHNICIAN
 
-        supervisor_row = db.fetchone_by_id(supervisor_id)
-        super_access_level = AccessLevel.from_string(supervisor_row.get("access_level", ""))
-        if super_access_level != AccessLevel.SUPERVISOR:
-            return CreateMaintenanceCases.SUPERVISOR_ID_IS_NOT_SUPERVISOR
+    #Verifica que se haya encontrado a todos los técnicos en la DB
+    if len(in_db_technicians) != len(asigned_technicians_id):
+        return CreateMaintenanceCases.NOT_REGISTERED_ID
+
+    supervisor_row = db.fetch_user_by_id(supervisor_id)
+    super_access_level = AccessLevel.from_string(supervisor_row.get("access_level", ""))
+    if super_access_level != AccessLevel.SUPERVISOR:
+        return CreateMaintenanceCases.SUPERVISOR_ID_IS_NOT_SUPERVISOR
 
     if maintenance_date < date.today():
         return CreateMaintenanceCases.NOT_VALID_DATE
@@ -55,16 +59,31 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
     )
 
     with UserSQL() as db:
-        for tech in asigned_technicians_id:
-            db.update_assigned_work_id(
-                work_id= new_maintenance.id,
-                tech_id= tech,
-            )
+        db.update_all_technicians_assigned_maintenance(
+            maintenance_id= new_maintenance.id,
+            tech_id= asigned_technicians_id,
+        )
+
     with MaintenanceSQL() as db:
         db.create_maintenance_order(
             new_maintenance= new_maintenance,
         )
     return CreateMaintenanceCases.CORRECT
+
+def conclude_maintenance(maintenance_id:str) -> bool:
+    if not maintenance_id:
+        return False
+    with MaintenanceSQL() as db:
+        technicians:list[str] = db.fetchall_technicians_in_maintenance(maintenance_id)
+        db.set_maintenance_no_longer_pending(maintenance_id)
+
+    with UserSQL() as db:
+        db.update_all_technicians_assigned_maintenance(
+            tech_id= technicians,
+            maintenance_id= None
+        )
+
+    return True
 
 def get_supervisor_pending_maintenances(supervisor_id:str) -> list[Maintenance]:
     """Obtiene una lista con todos los mantenimientos pendientes asignados por un supervisor"""
@@ -76,13 +95,17 @@ def get_supervisor_pending_maintenances(supervisor_id:str) -> list[Maintenance]:
 
 if __name__ == '__main__':
     print (create_maintenance_order(
-        supervisor_id= "ae6593c2-37fc-4370-9842-e97fda494faf",
+        supervisor_id= "8a9169c5-e722-4c29-97bf-e8fd9c9b270f",
         maintenance_date= date.today(),
         details= "Mantenimiento de prueba",
         name= "Arreglar lavadora",
-        asigned_technicians_id= ["732bd507-9223-4fa2-bc7a-598026352f22"],
-        equipment_code= "a16ebe3c-3efe-43ac-817a-15a83ef54e04"
+        asigned_technicians_id= ["285ee627-4d20-4312-869f-adf60bf918d6", "bde87a67-afe8-42e7-8656-2b79779cee0b"],
+        equipment_code= "23GH12"
     ).value)
+
+    print( conclude_maintenance(
+        maintenance_id= ""
+    ))
 
     #for item in get_supervisor_pending_maintenances("f70b82d0-5a56-498b-ab3f-6d6fc488b99c"):
     #    print (item.to_dict())

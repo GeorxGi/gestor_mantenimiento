@@ -5,19 +5,19 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     email TEXT NOT NULL,
     access_level TEXT NOT NULL,
-    assigned_work_id TEXT
+    assigned_maintenance_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS maintenance_orders (
     id TEXT PRIMARY KEY,
     supervisor_id TEXT NOT NULL,
-    equipment_id TEXT NOT NULL,
+    equipment_code TEXT NOT NULL,
     maintenance_date TEXT NOT NULL,
     is_pending INTEGER NOT NULL CHECK (is_pending IN (0, 1)),
     details TEXT,
     -- Referencias a tablas externas
     FOREIGN KEY (supervisor_id) REFERENCES users(id),
-    FOREIGN KEY (equipment_id) REFERENCES equipments(id)
+    FOREIGN KEY (equipment_code) REFERENCES equipments(id)
 
 );
 
