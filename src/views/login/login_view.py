@@ -1,4 +1,6 @@
 import flet as ft
+
+from src.enums.access_level import AccessLevel
 from src.utils.routes import register_view
 
 from src.widgets.gradient_text import gradient_text
@@ -12,8 +14,7 @@ from src.controllers.user.session_controller import login_user
 def _forgot_password():
     print('Evento para contraseña olvidada')
     pass
-
-@register_view("/login")
+@register_view('/login')
 class LoginView:
     def __init__(self, page: ft.Page):
         self.page = page
@@ -22,19 +23,21 @@ class LoginView:
         username = self.username_text_field.value
         password = self.password_text_field.value
         if not username or not password:
-            self.page.open(
-                custom_snack_bar(content= 'Rellene los campos')
-            )
+            self.page.open(custom_snack_bar(content= 'Rellene los campos'))
             return
         user = login_user(username= username, password= password)
         if not user:
-            self.page.open(
-                custom_snack_bar(content= 'Usuario o contraseña incorrectos')
-            )
+            self.page.open(custom_snack_bar(content= 'Usuario o contraseña incorrectos'))
             return
         else:
-            print('Login exitoso')
-            pass #IMPLEMENTAR MAS FUNCIONALIDAD
+            self.page.session.set(key= "local_user",value=  user.to_dict())
+            match user.access_level:
+                case AccessLevel.SUPERVISOR:
+                    self.page.go('supervisor_view')
+                case AccessLevel.TECHNICIAN:
+                    self.page.go('technician_view')
+                case AccessLevel.ADMIN:
+                    self.page.go('admin_view')
 
     username_text_field = CustomTextField(
         hint_label= "Usuario",
@@ -86,7 +89,7 @@ class LoginView:
         """Inicializar la interfaz de login"""
         return ft.View(
             appbar= ft.AppBar(),
-            route="/login",
+            route= '/login',
             vertical_alignment= ft.MainAxisAlignment.CENTER,
             horizontal_alignment= ft.CrossAxisAlignment.CENTER,
             controls=[

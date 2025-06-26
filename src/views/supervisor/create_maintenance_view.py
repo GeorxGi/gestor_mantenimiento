@@ -7,8 +7,7 @@ from src.widgets.custom_button import custom_button
 
 from src.consts.colors import gradient_colors, gradient_colors2, gradient_colors3, middle_color
 
-def maintenance_form(page: ft.Page):
-    
+def create_maintenance_view(page: ft.Page, on_success=None):
     title_form = ft.Column(
         controls= [
             # main_img,
@@ -17,11 +16,12 @@ def maintenance_form(page: ft.Page):
                 size= 80,
                 color= middle_color
             ),
-            ft.Text("Agregar orden de mantenimiento",
-                    size= 20,
-                    weight= ft.FontWeight.BOLD,
-                    color= ft.Colors.GREY_700
-                    ),
+            ft.Text(
+                value= "Agregar orden de mantenimiento",
+                size= 20,
+                weight= ft.FontWeight.BOLD,
+                color= ft.Colors.GREY_700
+            ),
             ft.Divider(height= 15, color= ft.Colors.GREY_300),
         ],
         alignment= ft.MainAxisAlignment.CENTER,
@@ -74,7 +74,7 @@ def maintenance_form(page: ft.Page):
                         # se abre una pagina, donde dice los ultimos 5 seleccionados, y luego una lista (asi estilo estados de ws).
                         
                         custom_button(
-                            "Equipo",
+                            text= "Equipo",
                             width=150,
                             height=150,
                             gradient= gradient_colors2,
@@ -82,7 +82,7 @@ def maintenance_form(page: ft.Page):
                             on_click= lambda e: print("ventana emergente de eleccion de equipo") 
                         ),
                         custom_button(
-                            "Tecnico",
+                            text= "Tecnico",
                             width=150,
                             height=150,
                             gradient= gradient_colors3,
@@ -94,14 +94,14 @@ def maintenance_form(page: ft.Page):
                     spacing=10
                 ),
                 input_form(
-                                label ="Descripcion",
-                                icon= ft.Icons.ASSIGNMENT
-                            ),
+                    label ="Descripcion",
+                    icon= ft.Icons.ASSIGNMENT
+                ),
                 ft.ElevatedButton(
                     width=350,
                     height=50,
                     content = ft.Row(
-                        [                            
+                        controls= [
                             ft.Icon(
                                 ft.Icons.DATE_RANGE,
                                 color=ft.Colors.GREY_700
@@ -118,7 +118,6 @@ def maintenance_form(page: ft.Page):
                         shape=ft.RoundedRectangleBorder(radius=20),
                     ),
                     on_click= open_date_picker,
-                    
                 ),
             ]
         )

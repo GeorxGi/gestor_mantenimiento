@@ -3,7 +3,7 @@ from src.utils.routes import register_view
 
 from src.widgets.gradient_button import gradient_button
 from src.widgets.gradient_text import gradient_text
-from src.consts.colors import gradient_colors, purple_color, middle_color
+from src.consts.colors import gradient_colors, middle_color
 
 @register_view('/')
 class WelcomePage:
