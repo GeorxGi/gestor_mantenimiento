@@ -2,7 +2,6 @@ import flet as ft
 
 from src.controllers.sql.base_sql import BaseSqlController
 
-
 def main(page: ft.Page):
     BaseSqlController.init_db()
     page.title= 'Gestor mantenimiento'

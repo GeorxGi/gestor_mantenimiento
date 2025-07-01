@@ -5,9 +5,13 @@ from src.views.supervisor.create_equipment_view import create_equipment_view
 from src.views.supervisor.create_maintenance_view import create_maintenance_view
 from src.views.supervisor.create_piece_view import create_piece_view
 
-from src.views.supervisor.inventory_view import inventory
-from src.views.supervisor.profile_view import profile_set
+#importanto barra global
+from src.widgets.global_app_bar import global_app_bar
+from src.widgets.global_navigation_bar import global_navigation_bar
 from src.widgets.custom_snack_bar import custom_snack_bar
+
+from src.views.supervisor.inventory_view import inventory
+from src.views.general.profile_view import profile_set
 
 from src.widgets.gradient_text import gradient_text
 from src.consts.colors import gradient_colors,middle_color
@@ -23,14 +27,30 @@ class ButtonsAdd(ft.ElevatedButton):
         self.color = ft.Colors.WHITE
         self.width = 250
 
-@register_view('supervisor_view')
-class SupervisorView:
+@register_view('dashboard')
+class DashboardView:
     def __init__(self, page: ft.Page):
         self.page = page
+        
+        # Obtener el nivel de acceso del usuario logueado
+        user_data = self.page.session.get("local_user")
+        self.access_level = "guest"
+        if user_data:
+            self.access_level = user_data.get("access_level", "guest")
+        
+        # Debug: mostrar el access_level
+        print(f"DEBUG - Access level: {self.access_level}")
+        print(f"DEBUG - User data: {user_data}")
+        
+        # Mostrar mensaje de bienvenida si viene del login
+        if user_data and not self.page.session.get("welcome_shown"):
+            full_name = user_data.get("fullname", "Usuario")
+            self.page.open(custom_snack_bar(content= f"¡Inicio de sesión exitoso! Bienvenido: {full_name}"))
+            self.page.session.set("welcome_shown", True)
+        
         self.last_selected_index = 0
 
         def close_control_view():
-            self.page.open(custom_snack_bar(content= 'Registro realizado exitosamente'))
             self.last_selected_index = 0
             self.close_add_options()
 
@@ -81,55 +101,20 @@ class SupervisorView:
         )
         self.content_area.controls.append(inventory(self.page))
         
-        self.navigation_bar = ft.NavigationBar(
-            selected_index= 0,
-            on_change = self.on_navigation,
-            height=100,
-            bgcolor= ft.Colors.WHITE,
-            destinations= [
-                ft.NavigationBarDestination(
-                    icon=ft.Icons.HOME_OUTLINED,
-                    label = "Inventario",
-                    selected_icon= ft.Icons.HOME
-                ),
-                ft.NavigationBarDestination(
-                    icon=ft.Container(
-                        content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
-                        bgcolor= middle_color,
-                        border_radius=20,
-                        width=60,
-                        height=35,
-                        alignment=ft.alignment.center
-                    ),
-                    selected_icon=ft.Container(
-                        content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
-                        bgcolor=middle_color,
-                        border_radius=20,
-                        width=60,
-                        height=35,
-                        alignment=ft.alignment.center
-                    ),
-                    label="Agregar"
-                ),
-                ft.NavigationBarDestination(
-                    icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
-                    label = "Perfil",
-                    selected_icon= ft.Icons.ACCOUNT_CIRCLE
-                ),
-                
-            ]
-        )
+        # RETORNA EL INDICE SELECCIONADO
+        self.navigation_bar = global_navigation_bar(self.page, self.access_level, self.on_navigation)
     
     def close_add_options(self):
         self.page.close(self.add_options)
         self.navigation_bar.selected_index = self.last_selected_index
         
+        profile_index = 2 if self.access_level == "SUPERVISOR" else 1
+        
         self.content_area.controls.clear()
-        match self.last_selected_index:
-            case 0:
-                self.content_area.controls.append(inventory(self.page))
-            case 2:
-                self.content_area.controls.append(profile_set(self.page))
+        if self.last_selected_index == 0:
+            self.content_area.controls.append(inventory(self.page))
+        elif self.last_selected_index == profile_index:
+            self.content_area.controls.append(profile_set(self.page))
         
         self.content_area.update()
         self.page.update()
@@ -137,49 +122,38 @@ class SupervisorView:
     def on_navigation(self, e):
         selected_index = e.control.selected_index
         
-        if selected_index != 1:
+        # Para supervisores: 0=Inventario, 1=Agregar, 2=Perfil
+        # Para otros: 0=Inventario, 1=Perfil
+        # cambio de indice  dependiendo el nivel de acceso
+        if self.access_level == "SUPERVISOR":
+            add_index = 1
+            profile_index = 2
+        else:
+            add_index = None
+            profile_index = 1
+        
+        # Solo actualizar last_selected_index si no es el botón agregar
+        if selected_index != add_index:
             self.last_selected_index = selected_index
             
         self.content_area.controls.clear()
-        match selected_index:
-            case 0:
-                self.content_area.controls.append(inventory(self.page))
-            case 1:
-                self.page.open(self.add_options)
-            case 2:
-                self.content_area.controls.append(profile_set(self.page))
+        
+        if selected_index == 0:  # Inventario
+            self.content_area.controls.append(inventory(self.page))
+        elif selected_index == add_index and self.access_level == "SUPERVISOR":  # Agregar
+            self.page.open(self.add_options)
+        elif selected_index == profile_index:  # Perfil
+            self.content_area.controls.append(profile_set(self.page))
                 
         self.content_area.update()
     
     def build(self):
-        # Configurar para evitar redimensionamiento con teclado
+        # segun para que no salga el teclado
         self.page.window.prevent_close = False
         
         return ft.View(
-            route= 'supervisor_view',
-            # este appbar puede ser global para todas las vistas de nivel de acceso
-            appbar= ft.AppBar(
-                automatically_imply_leading=False,
-                leading= ft.IconButton(
-                    icon= ft.Icons.DARK_MODE_OUTLINED  if self.page.theme_mode == ft.ThemeMode.LIGHT else ft.Icons.DARK_MODE,
-                ),
-                bgcolor= ft.Colors.WHITE,
-                title= gradient_text(
-                    text= "HAC",
-                    size= 30,
-                    text_weight= ft.FontWeight.BOLD,
-                    gradient= gradient_colors,
-                ),
-                center_title= True,
-                actions= [
-                    ft.IconButton(icon=ft.Icons.MESSAGE_OUTLINED,
-                              tooltip= "Mensajes",
-                              icon_color= ft.Colors.BLACK,
-                            #   on_click= lambda _: self.page.go('/messages')
-                    ),
-                    
-                ]
-            ),
+            route= 'dashboard',
+            appbar= global_app_bar(self.page, self.access_level),
             bottom_appbar= self.navigation_bar,
             controls= [
                 self.content_area
@@ -187,18 +161,18 @@ class SupervisorView:
         )
         
 if __name__ == '__main__':
-    print('Cargando supervisor en modo debug')
+    print('Cargando dashborad en modo debug')
 
     def test_supervisor_page(page: ft.Page):
-        page.title= "Supervisor (DEBUG MODE)"
+        page.title= "dashboard (DEBUG MODE)"
         page.window.resizable = True
         page.window.width = 500
         page.window.height =900
         page.theme_mode = ft.ThemeMode.LIGHT
         page.vertical_alignment = ft.MainAxisAlignment.CENTER
         page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
-        page.views.append(SupervisorView(page).build())
-        page.go('/supervisor')
+        page.views.append(DashboardView(page).build())
+        page.go('/dashboard')
 
     ft.app(
         target=test_supervisor_page
