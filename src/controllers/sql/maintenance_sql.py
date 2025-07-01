@@ -43,14 +43,13 @@ class MaintenanceSQL(BaseSqlController):
         )
 
     def fetchall_technicians_in_maintenance(self, maintenance_id:str) -> list[str]:
+        if not maintenance_id:
+            return []
         value = self._fetchall(
             query= f"SELECT technician_id FROM {self.second_table()} WHERE maintenance_id = ?",
             params= (maintenance_id, )
         )
-        return_list = []
-        for item in value:
-            return_list.append(item)
-        return return_list
+        return [row for row in value]
 
     def equipment_has_pending_maintenance(self, equipment_code:str) -> bool:
         has_maintenance = self._fetchone(
@@ -58,6 +57,16 @@ class MaintenanceSQL(BaseSqlController):
             params= (equipment_code,)
         )
         return True if has_maintenance else False
+
+    def set_maintenance_no_longer_pending(self, maintenance_id:str) -> bool:
+        """Establece el estado del mantenimiento a no pendiente y retorna un booleano que indica si
+        la fila fue modificada exitosamente"""
+        if not maintenance_id:
+            return False
+        return self._execute(
+            query= f"UPDATE {self.table()} SET is_pending = 0 WHERE id = ?",
+            params= (maintenance_id, )
+        )
 
 if __name__ == '__main__':
     with MaintenanceSQL() as db:

@@ -1,4 +1,5 @@
 import flet as ft
+
 from src.controllers.sql.base_sql import BaseSqlController
 
 def main(page: ft.Page):

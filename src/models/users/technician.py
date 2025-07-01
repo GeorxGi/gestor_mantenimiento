@@ -6,11 +6,11 @@ from src.enums.access_level import AccessLevel
 class Technician(User):
     def __init__(self, *, working_area:str = '', **kwargs):
         super().__init__(**kwargs)
-        self.asigned_work_id:str = ''
+        self.assigned_maintenance_id:str = ''
         self.working_area:str = working_area
 
     def asign_work(self, work_id:str):
-        self.asigned_work_id = work_id
+        self.assigned_maintenance_id = work_id
 
     @classmethod
     def from_dict(cls, data:dict):
@@ -22,7 +22,7 @@ class Technician(User):
 
     def to_simple_dict(self) -> dict:
         base = super().to_simple_dict()
-        base["asigned_work_id"] = self.asigned_work_id
+        base["assigned_maintenance_id"] = self.assigned_maintenance_id
 
         return base
     def define_access_level(self) -> Enum:

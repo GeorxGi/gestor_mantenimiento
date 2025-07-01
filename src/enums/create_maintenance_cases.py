@@ -3,7 +3,7 @@ from enum import Enum
 class CreateMaintenanceCases(str, Enum):
     CORRECT = "Mantenimiento creado exitosamente"
     EMPTY_IMPUT = "Rellene los campos indicados"
-    BUSY_TECHNICIAN = "Uno de los técnicos asociados está ocupado"
+    BUSY_TECHNICIAN = "Uno de los técnicos ingresados se encuentra ocupado"
     NOT_VALID_DATE = "Fecha de mantenimiento no válida"
     NOT_REGISTERED_ID = "Hubo un problema al verificar al supervisor o técnicos"
     EQUIPMENT_NOT_FOUND = "El ID del equipo ingresado no pudo ser encontrado"

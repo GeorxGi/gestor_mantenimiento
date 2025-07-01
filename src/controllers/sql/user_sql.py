@@ -9,19 +9,18 @@ class UserSQL(BaseSqlController):
 
     @property
     def public_fields(self):
-        fields = ["id", "fullname", "email", "access_level", "assigned_work_id"]
-        return ", ".join(fields)
+        return "id, fullname, email, access_level, assigned_maintenance_id"
 
     def create_user(self,*, fullname:str, username:str, password:str, email:str, access_level:AccessLevel,):
-        assigned_work_id = None
+        assigned_maintenance_id = None
         new_id = str(uuid4())
 
         self._execute(
             query= f"""
-                INSERT INTO {self.table()} (id, fullname, username, password, email, access_level, assigned_work_id)
+                INSERT INTO {self.table()} (id, fullname, username, password, email, access_level, assigned_maintenance_id)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-            params= (new_id, fullname, username, password, email, access_level.name, assigned_work_id))
+            params= (new_id, fullname, username, password, email, access_level.name, assigned_maintenance_id))
 
     def fetch_by_username(self, username:str) -> dict:
         row = self._fetchone(
@@ -44,7 +43,8 @@ class UserSQL(BaseSqlController):
             params=(access_level.name,)
             )
         ]
-    def fetchone_by_id(self, user_id:str) -> dict:
+
+    def fetch_user_by_id(self, user_id:str) -> dict:
         row = self._fetchone(
             query= f"SELECT {self.public_fields} FROM {self.table()} WHERE id = ?",
             params= (user_id, )
@@ -68,20 +68,24 @@ class UserSQL(BaseSqlController):
                 query= f"""
                     SELECT {self.public_fields} FROM {self.table()}
                     WHERE access_level = ?
-                    AND assigned_work_id IS NULL
+                    AND assigned_maintenance_id IS NULL
                     """,
                 params= (AccessLevel.TECHNICIAN.name, )
             )
         ]
 
-    def update_assigned_work_id(self,work_id:str, tech_id:str):
+    def update_all_technicians_assigned_maintenance(self, maintenance_id: str | None, tech_id:list[str]):
+        if not tech_id:
+            return
+
+        placeholder = ", ".join("?" for _ in tech_id)
         self._execute(
             query=f"""
-                UPDATE {self.table()} SET assigned_work_id = ?
-                WHERE id = ?
+                UPDATE {self.table()} SET assigned_maintenance_id = ?
+                WHERE id IN ({placeholder})
                 AND access_level = ?
                 """,
-            params= (work_id, tech_id, AccessLevel.TECHNICIAN.name)
+            params= (maintenance_id, tech_id, AccessLevel.TECHNICIAN.name)
         )
 
 if __name__ == '__main__':
