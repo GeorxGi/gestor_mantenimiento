@@ -20,7 +20,7 @@ def create_equipment(*, code:str, name:str, description:str, provider:str) -> Cr
                 provider=provider
             )
             return CreateEquipmentCases.CORRECT
-        except sqlite3.IntegrityError as e:
+        except sqlite3.IntegrityError:
             return CreateEquipmentCases.CODE_TAKEN
 
 def equipment_exists(equipment_code:str) -> bool:
@@ -33,4 +33,9 @@ def get_equipment(equipment_code:str) -> Equipment | None:
         return Equipment.from_dict(value) if value else None
 
 if __name__ == '__main__':
-    pass
+    print (create_equipment(
+        code= '123456',
+        name= 'Algo de prueba',
+        provider= 'Sansu',
+        description= 'Borrar luego'
+    ))

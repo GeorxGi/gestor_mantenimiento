@@ -1,5 +1,7 @@
 import flet as ft
-from controllers.sql.base_sql import BaseSqlController
+
+from src.controllers.sql.base_sql import BaseSqlController
+
 
 def main(page: ft.Page):
     BaseSqlController.init_db()
