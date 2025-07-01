@@ -32,6 +32,11 @@ def get_equipment(equipment_code:str) -> Equipment | None:
         value = db.fetch_equipment_data(equipment_code.upper())
         return Equipment.from_dict(value) if value else None
 
+def get_all_equipments() -> list[Equipment]:
+    with EquipmentSQL() as db:
+        equipments = db.get_by_partial_name("")
+        return [Equipment.from_dict(eq) for eq in equipments]
+
 if __name__ == '__main__':
     print (create_equipment(
         code= '123456',

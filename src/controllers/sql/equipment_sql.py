@@ -17,11 +17,16 @@ class EquipmentSQL(BaseSqlController):
 
     def get_by_partial_name(self, name:str) -> list[dict]:
         if not name:
-            return []
+            return self.get_all_equipments()
         """Metodo que retorna todas las instancias posibles en base a un nombre parcial"""
         query= f"SELECT * FROM {self.table()} WHERE LOWER(name) LIKE ?"
         params = (f"%{name.lower()}%",)
         rows = self._fetchall(query= query, params= params)
+        return [dict(row) for row in rows]
+    
+    def get_all_equipments(self) -> list[dict]:
+        """Obtiene todos los equipos"""
+        rows = self._fetchall(query=f"SELECT * FROM {self.table()}")
         return [dict(row) for row in rows]
 
     def delete_by_code(self, equipment_code:str) -> bool:
