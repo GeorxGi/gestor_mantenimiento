@@ -31,13 +31,8 @@ class LoginView:
             return
         else:
             self.page.session.set(key= "local_user",value=  user.to_dict())
-            match user.access_level:
-                case AccessLevel.SUPERVISOR:
-                    self.page.go('supervisor_view')
-                case AccessLevel.TECHNICIAN:
-                    self.page.go('technician_view')
-                case AccessLevel.ADMIN:
-                    self.page.go('admin_view')
+            self.page.session.set("welcome_shown", False)  # Reset welcome flag
+            self.page.go('dashboard')
 
     username_text_field = CustomTextField(
         hint_label= "Usuario",
