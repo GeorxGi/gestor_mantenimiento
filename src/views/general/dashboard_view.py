@@ -34,9 +34,9 @@ class DashboardView:
         
         # Obtener el nivel de acceso del usuario logueado
         user_data = self.page.session.get("local_user")
-        self.access_level = "guest"
+        self.access_level = "SUPERVISOR"
         if user_data:
-            self.access_level = user_data.get("access_level", "guest")
+            self.access_level = user_data.get("access_level", "SUPERVISOR")
         
         # Debug: mostrar el access_level
         print(f"DEBUG - Access level: {self.access_level}")

@@ -10,8 +10,8 @@ from src.consts.colors import gradient_colors, middle_color
 from src.controllers.equipment_controller import create_equipment
             
 def create_equipment_view(page: ft.Page, on_success = None):
-    name_input = input_form(label="Nombre", icon=ft.Icons.CREATE)
     code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2)
+    name_input = input_form(label="Nombre", icon=ft.Icons.CREATE)
     description_input = input_form(label="Descripcion", icon=ft.Icons.ASSIGNMENT)
     provider_input = input_form(label="Proveedor", icon=ft.Icons.STORE)
 
