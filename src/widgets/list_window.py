@@ -4,6 +4,8 @@ from src.controllers.sql.equipment_sql import EquipmentSQL
 from src.controllers.sql.user_sql import UserSQL
 from src.enums.access_level import AccessLevel
 
+from src.consts.colors import *
+
 def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_select=None, multi_select: bool = False) -> ft.AlertDialog:
     selected_id = None
     selected_ids = set() if multi_select else None
@@ -51,7 +53,12 @@ def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_selec
                 is_selected = (selected_id == item['id']) if not multi_select else (item['id'] in selected_ids)
                 item_list.controls.append(
                     ft.ListTile(
-                        leading=ft.Icon(ft.Icons.PERSON),
+                        leading=ft.CircleAvatar(
+                            content= ft.Icon(ft.Icons.PERSON),
+                            bgcolor= middle_color,
+                            color= ft.Colors.WHITE
+                            ),
+
                         title=ft.Text(item['fullname']),
                         subtitle=ft.Text(f"Email: {item['email']}"),
                         trailing=ft.Icon(ft.Icons.CHECK if is_selected else ft.Icons.ARROW_FORWARD_IOS),
@@ -88,11 +95,17 @@ def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_selec
         actions=[
             ft.ElevatedButton(
                 "Seleccionar",
-                on_click=lambda e: confirm_selection()
+                on_click=lambda e: confirm_selection(),
+                bgcolor= middle_color,
+                color = ft.Colors.WHITE,
+                width=100
             ),
             ft.ElevatedButton(
                 "Cerrar",
-                on_click=lambda e: close_dialog()
+                on_click=lambda e: close_dialog(),
+                bgcolor= ft.Colors.RED_300,
+                color = ft.Colors.WHITE,
+                width=100
             )
         ]
     )
