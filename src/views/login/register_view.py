@@ -16,6 +16,111 @@ from src.controllers.user.session_controller import register_user
 class RegisterView:
     def __init__(self, page: ft.Page):
         self.page = page
+        self.email_text_field = CustomTextField(
+            hint_label= "Correo electrónico",
+            width= 350,
+            icon= ft.Icons.EMAIL
+        )
+        self.fullname_text_field = CustomTextField(
+        hint_label= 'Nombre completo',
+        width= 350,
+        icon= ft.Icons.PERSON
+        )
+        self.username_text_field = CustomTextField(
+            hint_label= "Usuario",
+            width= 350,
+            icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
+        )
+        self.password_text_field = CustomTextField(
+            hint_label= "Contraseña",
+            width= 350,
+            icon= ft.Icons.HTTPS,
+            is_pass= True,
+        )
+        self.access_level_DropDown = ft.Dropdown(
+            width= 350,
+            hint_text= "Nivel de acceso",
+            leading_icon=ft.Icon(ft.Icons.SUPERVISOR_ACCOUNT),
+            options= [
+                ft.dropdown.Option(text= "Administrador", key= AccessLevel.ADMIN.value),
+                ft.dropdown.Option(text="Supervisor", key= AccessLevel.SUPERVISOR.value),
+                ft.dropdown.Option(text= "Técnico", key= AccessLevel.TECHNICIAN.value),
+            ],
+            color= ft.Colors.GREY_500,
+            border_color= ft.Colors.GREY_300,
+            focused_border_color= ft.Colors.GREY_500,
+            text_size= 14,
+            text_style= ft.TextStyle(
+                color= ft.Colors.GREY_500,
+            ),
+            border_radius= ft.border_radius.all(10),
+            content_padding= ft.padding.only(left= 10, right= 10),
+        )
+        self.main_view_container = ft.Container(
+            height= 500,
+            bgcolor= ft.Colors.WHITE,
+            border_radius= ft.border_radius.all(20),
+            border= ft.border.all(1, ft.Colors.GREY_200),
+            content= ft.Column(
+                alignment= ft.MainAxisAlignment.CENTER,
+                horizontal_alignment= ft.CrossAxisAlignment.CENTER,
+                spacing= 10,
+                controls= [
+                    gradient_text(
+                        text= "HAC",
+                        size= 60,
+                        text_weight= ft.FontWeight.BOLD,
+                        gradient= gradient_colors,
+                    ),
+                    ft.Container(
+                        alignment= ft.alignment.center,
+                        margin= ft.margin.only(bottom= 10),
+                        content= ft.Text(
+                            value= "¡Bienvenido!",
+                            size= 15,
+                            color= ft.Colors.GREY_500,
+                        ),
+                    ),
+                    self.fullname_text_field,
+                    self.email_text_field,
+                    self.username_text_field,
+                    self.password_text_field,
+                    self.access_level_DropDown,
+                ],
+            ),
+        )
+
+        self.CheckBox_Agreement =  ft.CupertinoCheckbox(
+        value= False,
+        active_color="#8855ff",
+        )
+
+        self.Agreement = ft.Row(
+            vertical_alignment= ft.CrossAxisAlignment.CENTER,
+            alignment= ft.MainAxisAlignment.CENTER,
+            controls= [
+                self.CheckBox_Agreement,
+                ft.Text(
+                    spans=[
+                        ft.TextSpan(
+                            text= "Acepto los ",
+                            style=ft.TextStyle(
+                                size=16,
+                                color=ft.Colors.GREY_500,
+                            ),
+                        ),
+                        ft.TextSpan(
+                            text= "términos y condiciones",
+                            url= "https://www.macroplastics.com/images/docs/Terminos-y-Condiciones-de-Venta.pdf",
+                            style=ft.TextStyle(
+                                size=16,
+                                color=ft.Colors.BLUE
+                            ),
+                        ),
+                    ]
+                ),
+            ],
+        )
 
     def _close_view(self):
         self._reset_fields()
@@ -58,112 +163,6 @@ class RegisterView:
             return
         else:
             self.page.open(custom_snack_bar(content= str(register_result.value)))
-
-    email_text_field = CustomTextField(
-        hint_label= "Correo electrónico",
-        width= 350,
-        icon= ft.Icons.EMAIL
-    )
-    fullname_text_field = CustomTextField(
-        hint_label= 'Nombre completo',
-        width= 350,
-        icon= ft.Icons.PERSON
-    )
-    username_text_field = CustomTextField(
-        hint_label= "Usuario",
-        width= 350,
-        icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
-    )
-    password_text_field = CustomTextField(
-        hint_label= "Contraseña",
-        width= 350,
-        icon= ft.Icons.HTTPS,
-        is_pass= True,
-    )
-    access_level_DropDown = ft.Dropdown(
-        width= 350,
-        hint_text= "Nivel de acceso",
-        leading_icon=ft.Icon(ft.Icons.SUPERVISOR_ACCOUNT),
-        options= [
-            ft.dropdown.Option(text= "Administrador", key= AccessLevel.ADMIN.value),
-            ft.dropdown.Option(text="Supervisor", key= AccessLevel.SUPERVISOR.value),
-            ft.dropdown.Option(text= "Técnico", key= AccessLevel.TECHNICIAN.value),
-        ],
-        color= ft.Colors.GREY_500,
-        border_color= ft.Colors.GREY_300,
-        focused_border_color= ft.Colors.GREY_500,
-        text_size= 14,
-        text_style= ft.TextStyle(
-            color= ft.Colors.GREY_500,
-        ),
-        border_radius= ft.border_radius.all(10),
-        content_padding= ft.padding.only(left= 10, right= 10),
-    )
-    _main_view_container = ft.Container(
-        height= 500,
-        bgcolor= ft.Colors.WHITE,
-        border_radius= ft.border_radius.all(20),
-        border= ft.border.all(1, ft.Colors.GREY_200),
-        content= ft.Column(
-            alignment= ft.MainAxisAlignment.CENTER,
-            horizontal_alignment= ft.CrossAxisAlignment.CENTER,
-            spacing= 10,
-            controls= [
-                gradient_text(
-                    text= "HAC",
-                    size= 60,
-                    text_weight= ft.FontWeight.BOLD,
-                    gradient= gradient_colors,
-                ),
-                ft.Container(
-                    alignment= ft.alignment.center,
-                    margin= ft.margin.only(bottom= 10),
-                    content= ft.Text(
-                        value= "¡Bienvenido!",
-                        size= 15,
-                        color= ft.Colors.GREY_500,
-                    ),
-                ),
-                fullname_text_field,
-                email_text_field,
-                username_text_field,
-                password_text_field,
-                access_level_DropDown,
-            ],
-        ),
-    )
-    
-    CheckBox_Agreement =  ft.CupertinoCheckbox(
-        value= False,
-        active_color="#8855ff",
-    )
-    
-    Agreement = ft.Row(
-        vertical_alignment= ft.CrossAxisAlignment.CENTER,
-        alignment= ft.MainAxisAlignment.CENTER,
-        controls= [
-            CheckBox_Agreement,
-            ft.Text(
-                spans=[
-                    ft.TextSpan(
-                        text= "Acepto los ",
-                        style=ft.TextStyle(
-                            size=16,
-                            color=ft.Colors.GREY_500,
-                        ),
-                    ),
-                    ft.TextSpan(
-                        text= "términos y condiciones",
-                        url= "https://www.macroplastics.com/images/docs/Terminos-y-Condiciones-de-Venta.pdf",
-                        style=ft.TextStyle(
-                            size=16,
-                            color=ft.Colors.BLUE
-                        ),
-                    ),
-                ]
-            ),
-        ],
-    )
     
     def build(self) -> ft.View:
         """Inicializar la interfaz de Register"""
@@ -180,7 +179,7 @@ class RegisterView:
                     size= 30,
                     color= ft.Colors.GREY,
                 ),
-                self._main_view_container,
+                self.main_view_container,
                 self.Agreement,
                 gradient_button(
                     text= "Continuar",
