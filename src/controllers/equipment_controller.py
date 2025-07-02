@@ -33,9 +33,4 @@ def get_equipment(equipment_code:str) -> Equipment | None:
         return Equipment.from_dict(value) if value else None
 
 if __name__ == '__main__':
-    print (create_equipment(
-        code= '123456',
-        name= 'Algo de prueba',
-        provider= 'Sansu',
-        description= 'Borrar luego'
-    ))
+    pass

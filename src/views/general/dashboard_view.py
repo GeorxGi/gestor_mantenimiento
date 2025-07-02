@@ -1,11 +1,12 @@
 import flet as ft
+
+from src.enums.access_level import AccessLevel
 from src.utils.routes import register_view
 
 from src.views.supervisor.create_equipment_view import create_equipment_view
 from src.views.supervisor.create_maintenance_view import create_maintenance_view
 from src.views.supervisor.create_piece_view import create_piece_view
 
-#importanto barra global
 from src.widgets.global_app_bar import global_app_bar
 from src.widgets.global_navigation_bar import global_navigation_bar
 from src.widgets.custom_snack_bar import custom_snack_bar
@@ -13,8 +14,7 @@ from src.widgets.custom_snack_bar import custom_snack_bar
 from src.views.supervisor.inventory_view import inventory
 from src.views.general.profile_view import profile_set
 
-from src.widgets.gradient_text import gradient_text
-from src.consts.colors import gradient_colors,middle_color
+from src.consts.colors import middle_color
 
 class ButtonsAdd(ft.ElevatedButton):
     def __init__(self, text, on_click_event):
@@ -26,6 +26,7 @@ class ButtonsAdd(ft.ElevatedButton):
         self.bgcolor = middle_color
         self.color = ft.Colors.WHITE
         self.width = 250
+        self.height = 40
 
 @register_view('dashboard')
 class DashboardView:
@@ -34,10 +35,9 @@ class DashboardView:
         
         # Obtener el nivel de acceso del usuario logueado
         user_data = self.page.session.get("local_user")
-        self.access_level = "guest"
-        if user_data:
-            self.access_level = user_data.get("access_level", "guest")
-        
+
+        self.access_level:AccessLevel = AccessLevel.from_string(user_data.get("access_level")) if user_data else AccessLevel.USER
+
         # Debug: mostrar el access_level
         print(f"DEBUG - Access level: {self.access_level}")
         print(f"DEBUG - User data: {user_data}")
@@ -73,22 +73,17 @@ class DashboardView:
                         ButtonsAdd(text= "Equipo", on_click_event= lambda _: navigate_to(create_equipment_view)),
                         ButtonsAdd(text= "Orden de mantenimiento", on_click_event= lambda _: navigate_to(create_maintenance_view)),
                         ButtonsAdd(text= "Solicitud de pieza", on_click_event= lambda _: navigate_to(create_piece_view)),
-                        ft.IconButton(
-                            ft.Icons.CLOSE,
-                            on_click=lambda _: self.close_add_options(),
-                            icon_color=ft.Colors.GREY_500
-                        )
                     ], 
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                     spacing=10
                 ),
                 alignment=ft.alignment.center,
                 width=350,
-                height=300,
-                padding=10,
+                height=250,
+                padding=20,
             ),
             # esto evita que al tocar afuera del bottonsheet se cierra
-            dismissible=False,
+            dismissible=True,
             is_scroll_controlled=True,
             enable_drag=False
         )
@@ -121,30 +116,25 @@ class DashboardView:
     
     def on_navigation(self, e):
         selected_index = e.control.selected_index
-        
-        # Para supervisores: 0=Inventario, 1=Agregar, 2=Perfil
-        # Para otros: 0=Inventario, 1=Perfil
-        # cambio de indice  dependiendo el nivel de acceso
-        if self.access_level == "SUPERVISOR":
-            add_index = 1
-            profile_index = 2
-        else:
-            add_index = None
-            profile_index = 1
-        
-        # Solo actualizar last_selected_index si no es el botón agregar
-        if selected_index != add_index:
-            self.last_selected_index = selected_index
-            
-        self.content_area.controls.clear()
-        
-        if selected_index == 0:  # Inventario
-            self.content_area.controls.append(inventory(self.page))
-        elif selected_index == add_index and self.access_level == "SUPERVISOR":  # Agregar
+
+        add_index = 1 if self.access_level == AccessLevel.SUPERVISOR else None
+        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else 1
+
+        if selected_index == add_index and self.access_level == AccessLevel.SUPERVISOR:
             self.page.open(self.add_options)
-        elif selected_index == profile_index:  # Perfil
+
+            e.control.selected_index = self.last_selected_index
+            self.page.update()
+            return
+
+        self.last_selected_index = selected_index
+        self.content_area.controls.clear()
+
+        if selected_index == 0:
+            self.content_area.controls.append(inventory(self.page))
+        elif selected_index == profile_index:
             self.content_area.controls.append(profile_set(self.page))
-                
+
         self.content_area.update()
     
     def build(self):
@@ -154,10 +144,8 @@ class DashboardView:
         return ft.View(
             route= 'dashboard',
             appbar= global_app_bar(self.page, self.access_level),
-            bottom_appbar= self.navigation_bar,
-            controls= [
-                self.content_area
-            ],
+            navigation_bar= self.navigation_bar,
+            controls= [ self.content_area ],
         )
         
 if __name__ == '__main__':

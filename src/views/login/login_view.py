@@ -1,6 +1,5 @@
 import flet as ft
 
-from src.enums.access_level import AccessLevel
 from src.utils.routes import register_view
 
 from src.widgets.gradient_text import gradient_text
