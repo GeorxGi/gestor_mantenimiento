@@ -6,8 +6,34 @@ from src.widgets.input_form import input_form
 from src.consts.colors import gradient_colors, middle_color
 
 def create_piece_view(page:ft.Page, on_success=None):
-    code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2)
+    
+    def pick_image(e):
+        file_picker.pick_files(
+            allow_multiple=False,
+            allowed_extensions=["png", "jpg", "jpeg", "gif", "bmp"]
+        )
+    
+    def on_file_picked(e: ft.FilePickerResultEvent):
+        if e.files:
+            selected_file = e.files[0]
+            container_img_piece.content = ft.Image(
+                src=selected_file.path,
+                width=150,
+                height=150,
+                fit=ft.ImageFit.COVER
+            )
+            page.update()
+    
+    file_picker = ft.FilePicker(on_result=on_file_picked)
+    page.overlay.append(file_picker)
+    
+    code_input = input_form(label="numero ai de bd", icon=ft.Icons.QR_CODE_2)
+    code_input.disabled = True
+    
+    name_input = input_form(label="Nombre", icon=ft.Icons.EDIT_ROUNDED)
+    # Luis: no se si necesitas la cantidad para registrar la pieza, o de por si la cantidad = 0 de manera predeterminada
     quantity_input = input_form(label="Cantidad", icon=ft.Icons.NUMBERS)
+    quantity_input.visible = False
 
     title_form = ft.Column(
         controls = [
@@ -17,7 +43,7 @@ def create_piece_view(page:ft.Page, on_success=None):
                 color= middle_color
                 ),
             ft.Text(
-                value="Agregar solicitud de pieza",
+                value="Agregar pieza",
                 size= 25,
                 weight= ft.FontWeight.BOLD,
                 color= ft.Colors.GREY_700
@@ -34,16 +60,38 @@ def create_piece_view(page:ft.Page, on_success=None):
         height= 150,
         bgcolor= ft.Colors.GREY_300,
         border_radius= 20,
+        alignment= ft.alignment.center,
         content= ft.Icon(
-            ft.Icons.IMAGE,
-            size= 100,
-            color= ft.Colors.WHITE
+                    ft.Icons.IMAGE,
+                    size= 100,
+                    color= ft.Colors.WHITE
+                )
         )
+    
+    row_image = ft.Stack(
+        controls=[
+            ft.Container(
+                content=container_img_piece,
+                alignment=ft.alignment.center
+            ),
+            ft.Container(
+                content=ft.IconButton(
+                    icon= ft.Icons.PUBLISH,
+                    icon_color= ft.Colors.WHITE,
+                    bgcolor= ft.Colors.GREY_700,
+                    icon_size= 20,
+                    on_click= pick_image,
+                ),
+                alignment=ft.alignment.bottom_right,
+                margin=ft.margin.only(right=10, bottom=10)
+            )
+        ],
+        height=150
     )
     
     container_form = ft.Container(
         width= 400,
-        height= 500,
+        height= 550,
         bgcolor=ft.Colors.WHITE,
         border= ft.border.all(1, ft.Colors.GREY_300),
         border_radius= 20,
@@ -53,8 +101,9 @@ def create_piece_view(page:ft.Page, on_success=None):
             horizontal_alignment= ft.CrossAxisAlignment.CENTER,
             controls=[
                 title_form,
-                container_img_piece,
+                row_image,
                 code_input,
+                name_input,
                 quantity_input,
             ]
         )
