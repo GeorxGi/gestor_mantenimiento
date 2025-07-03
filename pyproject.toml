@@ -1,11 +1,13 @@
 [project]
-name = "gestor-mantenimiento"
+name = "Gestor mantenimiento"
 version = "0.1.0"
-description = ""
+description = "Aplicación creada para el manejo de tecnicos, mantenimientos y en general, logica empresarial"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 authors = [
-    { name = "Flet developer", email = "you@example.com" }
+    { name = "Georges Chakour", email = "georgechakour2004@gmail.com" },
+    { name = "Luis Álvarez", email = ""},
+    { name = "Karina Huang", email = ""}
 ]
 dependencies = [
   "flet==0.28.3"
@@ -14,14 +16,14 @@ dependencies = [
 [tool.flet]
 # org name in reverse domain name notation, e.g. "com.mycompany".
 # Combined with project.name to build bundle ID for iOS and Android apps
-org = "com.mycompany"
+org = "com.georxgi_Luigif10"
 
 # project display name that is used as an app title on Android and iOS home screens,
 # shown in window titles and about app dialogs on desktop.
-product = "gestor-mantenimiento"
+product = "Gestor Mantenimiento"
 
 # company name to display in about app dialogs
-company = "Flet"
+company = "USM students"
 
 # copyright text to display in about app dialogs
 copyright = "Copyright (C) 2025 by Flet"

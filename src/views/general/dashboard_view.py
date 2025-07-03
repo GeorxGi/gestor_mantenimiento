@@ -33,6 +33,7 @@ class ButtonsAdd(ft.ElevatedButton):
 class DashboardView:
     def __init__(self, page: ft.Page):
         self.page = page
+        self.page.scroll = True
         
         # Obtener el nivel de acceso del usuario logueado
         user_data = self.page.session.get("local_user")
@@ -48,7 +49,7 @@ class DashboardView:
             )
             full_name = user_data.get("fullname", "Usuario")
             self.page.open(custom_snack_bar(content= f"¡Inicio de sesión exitoso! Bienvenido: {full_name}"))
-            self.page.session.set("welcome_shown", True)
+            self.page.session.set(key= "welcome_shown",value= True)
         
         self.last_selected_index = 0
 

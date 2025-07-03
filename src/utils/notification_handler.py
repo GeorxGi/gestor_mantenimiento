@@ -5,8 +5,6 @@ from src.widgets.custom_snack_bar import custom_snack_bar
 
 listening_sessions = {}
 
-
-
 def notify_supervisors(event:str, content:str):
     for session in listening_sessions.values():
         if session["access_level"] == AccessLevel.SUPERVISOR.name:

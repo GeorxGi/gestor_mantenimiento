@@ -10,6 +10,13 @@ from src.models.users.technician import Technician
 from src.models.users.supervisor import Supervisor
 from src.models.users.user import User
 
+from src.controllers.sql.user_sql import UserSQL
+
+def get_user_by_id(user_id:str) -> Technician | Supervisor | Admin | None:
+    with UserSQL() as db:
+        data = db.fetch_user_by_id(user_id)
+        return _create_user_from_dict(data)
+
 def check_access_level(user:User):
     return user.get_access_level()
 

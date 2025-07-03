@@ -1,6 +1,11 @@
 import flet as ft
 import datetime
 
+from src.controllers.maintenance_controller import create_maintenance_order
+from src.enums.create_maintenance_cases import CreateMaintenanceCases
+from src.models.maintenance import Maintenance
+from src.widgets.custom_snack_bar import custom_snack_bar
+
 from src.widgets.gradient_button import gradient_button
 from src.widgets.input_form import input_form
 from src.widgets.custom_button import custom_button
@@ -10,16 +15,14 @@ from src.widgets.list_window import list_window
 from src.consts.colors import gradient_colors, gradient_colors2, gradient_colors3, middle_color
 
 def create_maintenance_view(page: ft.Page, on_success=None):
-    selected_equipment = None
+    supervisor_id = page.session.get("local_user").get("id", "")
+    selected_equipment_code:str | None = None
     selected_technicians = []
     description_input = input_form(label="Descripcion", icon=ft.Icons.ASSIGNMENT)
     date_picker = ft.DatePicker(
         first_date = datetime.datetime.now(),
-        on_change= lambda e: print(f"fecha seleccionada: {e.data}"),
-        on_dismiss= lambda e: print("fecha no seleccionada")
     )
-    
-    
+
     title_form = ft.Column(
         controls= [
             # main_img,
@@ -42,7 +45,7 @@ def create_maintenance_view(page: ft.Page, on_success=None):
     )
     
     
-    def open_date_picker(e):
+    def open_date_picker(_):
         date_picker.open = True
         page.update()
         
@@ -52,7 +55,7 @@ def create_maintenance_view(page: ft.Page, on_success=None):
         color= ft.Colors.GREY_700
     )
     
-    def handle_date_selection(e):
+    def handle_date_selection(_):
         if date_picker.value:
             selected_date.value = date_picker.value.strftime("%d-%m-%Y")
         else:
@@ -64,15 +67,13 @@ def create_maintenance_view(page: ft.Page, on_success=None):
     page.overlay.append(date_picker)
     
     def on_equipment_selected(equipment_code):
-        nonlocal selected_equipment
-        selected_equipment = equipment_code
-        print(f"Equipo seleccionado: {equipment_code}")
-    
+        nonlocal selected_equipment_code
+        selected_equipment_code = equipment_code
+
     def on_technicians_selected(technician_ids):
         nonlocal selected_technicians
         selected_technicians = technician_ids
-        print(f"Técnicos seleccionados: {technician_ids}")
-    
+
     def open_equipment_dialog():
         dialog = list_window("Seleccionar Equipo", page, "equipment", on_equipment_selected)
         page.open(dialog)
@@ -80,6 +81,20 @@ def create_maintenance_view(page: ft.Page, on_success=None):
     def open_technician_dialog():
         dialog = list_window("Seleccionar Técnicos", page, "technician", on_technicians_selected, multi_select=True)
         page.open(dialog)
+
+
+    def register_maintenance():
+        response = create_maintenance_order(
+            maintenance_date= Maintenance.get_date_by_string(selected_date.value),
+            details= description_input.value,
+            supervisor_id= supervisor_id,
+            equipment_code= selected_equipment_code,
+            asigned_technicians_id= selected_technicians
+        )
+        page.open(custom_snack_bar(content= str(response.value)))
+        if response == CreateMaintenanceCases.CORRECT:
+            if on_success:
+                on_success()
     
     container_form = ft.Container(
         width=400,
@@ -96,7 +111,7 @@ def create_maintenance_view(page: ft.Page, on_success=None):
                 ft.Row(
                     controls=[
                         # estos custom buttons son para seleccionar el equipo y tecnico
-                        # se abre una pagina, donde dice los ultimos 5 seleccionados, y luego una lista (asi estilo estados de ws).
+                        # se abre una página, donde dice los ultimos 5 seleccionados, y luego una lista (asi estilo estados de ws).
                         
                         custom_button(
                             text= "Equipo",
@@ -154,7 +169,7 @@ def create_maintenance_view(page: ft.Page, on_success=None):
                     width=300,
                     height=48,
                     gradient= gradient_colors,
-                    on_click= lambda e: print(f'Equipo: {selected_equipment}, Técnicos: {selected_technicians}'),
+                    on_click= lambda _: register_maintenance(),
                 )
             ],
             alignment=ft.MainAxisAlignment.CENTER,

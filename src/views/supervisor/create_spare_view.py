@@ -5,7 +5,7 @@ from src.widgets.input_form import input_form
 
 from src.consts.colors import gradient_colors, middle_color
 
-def create_piece_view(page:ft.Page, on_success=None):
+def create_spare_view(page:ft.Page, on_success=None):
     
     def pick_image(e):
         file_picker.pick_files(
@@ -62,15 +62,16 @@ def create_piece_view(page:ft.Page, on_success=None):
         border_radius= 20,
         alignment= ft.alignment.center,
         content= ft.Icon(
-                    ft.Icons.IMAGE,
-                    size= 100,
-                    color= ft.Colors.WHITE
-                )
+            ft.Icons.IMAGE,
+            size= 100,
+            color= ft.Colors.WHITE
+            )
         )
     
     row_image = ft.Stack(
         controls=[
             ft.Container(
+            height=150,
                 content=container_img_piece,
                 alignment=ft.alignment.center
             ),
@@ -86,7 +87,6 @@ def create_piece_view(page:ft.Page, on_success=None):
                 margin=ft.margin.only(right=10, bottom=10)
             )
         ],
-        height=150
     )
     
     container_form = ft.Container(

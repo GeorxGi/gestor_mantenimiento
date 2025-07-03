@@ -1,4 +1,5 @@
 from src.controllers.sql.base_sql import BaseSqlController
+from src.controllers.sql.equipment_sql import EquipmentSQL
 from src.models.maintenance import Maintenance
 
 class MaintenanceSQL(BaseSqlController):
@@ -50,6 +51,23 @@ class MaintenanceSQL(BaseSqlController):
             params= (maintenance_id, )
         )
         return [row for row in value]
+
+    def fetch_maintenance_basic_info(self, maintenance_id:str) -> dict:
+        query = f"""
+            SELECT m.details, m.maintenance_date, e.name
+            FROM {self.table()} m
+            JOIN {EquipmentSQL().table()} e ON m.equipment_code = e.code
+            WHERE m.id = ?
+        """
+        row = self._fetchone(query, params= (maintenance_id, ))
+        if not row:
+            return {}
+        else:
+            return{
+                "details": row[0],
+                "date": row[1],
+                "equipment_name": row[2]
+            }
 
     def equipment_has_pending_maintenance(self, equipment_code:str) -> bool:
         has_maintenance = self._fetchone(
