@@ -36,7 +36,17 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Finalmente, ejecuta el archivo main.py.
+Finalmente, ejecuta el programa desde main.py con el comando:
+
+```bash
+flet run main.py
+```
+
+Si se desea ejecutar como un servidor web puede usarse el comando:
+
+```bash
+flet run main.py --web --host 0.0.0.0 --port 8550
+```
 
 ## Desarrolladores
 
