@@ -1,6 +1,6 @@
 import flet as ft
             
-def input_form(*, label: str, icon: str) -> ft.TextField:
+def input_form(*, label: str, icon: str, disabled: bool = True) -> ft.TextField:
     # Normalize the label for comparison to avoid case-sensitivity issues
     normalized_label = label.lower()
 

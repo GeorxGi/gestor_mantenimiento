@@ -5,9 +5,21 @@ from src.widgets.gradient_button import gradient_button
 from src.widgets.input_form import input_form
 from src.widgets.custom_button import custom_button
 
+from src.widgets.list_window import list_window
+
 from src.consts.colors import gradient_colors, gradient_colors2, gradient_colors3, middle_color
 
 def create_maintenance_view(page: ft.Page, on_success=None):
+    selected_equipment = None
+    selected_technicians = []
+    description_input = input_form(label="Descripcion", icon=ft.Icons.ASSIGNMENT)
+    date_picker = ft.DatePicker(
+        first_date = datetime.datetime.now(),
+        on_change= lambda e: print(f"fecha seleccionada: {e.data}"),
+        on_dismiss= lambda e: print("fecha no seleccionada")
+    )
+    
+    
     title_form = ft.Column(
         controls= [
             # main_img,
@@ -29,11 +41,6 @@ def create_maintenance_view(page: ft.Page, on_success=None):
         spacing=5
     )
     
-    date_picker = ft.DatePicker(
-        first_date = datetime.datetime.now(),
-        on_change= lambda e: print(f"fecha seleccionada: {e.data}"),
-        on_dismiss= lambda e: print("fecha no seleccionada")
-    )
     
     def open_date_picker(e):
         date_picker.open = True
@@ -55,6 +62,24 @@ def create_maintenance_view(page: ft.Page, on_success=None):
         
     date_picker.on_change = handle_date_selection
     page.overlay.append(date_picker)
+    
+    def on_equipment_selected(equipment_code):
+        nonlocal selected_equipment
+        selected_equipment = equipment_code
+        print(f"Equipo seleccionado: {equipment_code}")
+    
+    def on_technicians_selected(technician_ids):
+        nonlocal selected_technicians
+        selected_technicians = technician_ids
+        print(f"Técnicos seleccionados: {technician_ids}")
+    
+    def open_equipment_dialog():
+        dialog = list_window("Seleccionar Equipo", page, "equipment", on_equipment_selected)
+        page.open(dialog)
+    
+    def open_technician_dialog():
+        dialog = list_window("Seleccionar Técnicos", page, "technician", on_technicians_selected, multi_select=True)
+        page.open(dialog)
     
     container_form = ft.Container(
         width=400,
@@ -79,7 +104,7 @@ def create_maintenance_view(page: ft.Page, on_success=None):
                             height=150,
                             gradient= gradient_colors2,
                             icon= ft.Icons.PRECISION_MANUFACTURING,
-                            on_click= lambda e: print("ventana emergente de eleccion de equipo") 
+                            on_click= lambda e: open_equipment_dialog()
                         ),
                         custom_button(
                             text= "Tecnico",
@@ -87,16 +112,13 @@ def create_maintenance_view(page: ft.Page, on_success=None):
                             height=150,
                             gradient= gradient_colors3,
                             icon= ft.Icons.PERSON,
-                            on_click= lambda e: print("ventana emergente de eleccion de tecnico")
+                            on_click= lambda e: open_technician_dialog()
                         )
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                     spacing=10
                 ),
-                input_form(
-                    label ="Descripcion",
-                    icon= ft.Icons.ASSIGNMENT
-                ),
+                description_input,
                 ft.ElevatedButton(
                     width=350,
                     height=50,
@@ -132,12 +154,12 @@ def create_maintenance_view(page: ft.Page, on_success=None):
                     width=300,
                     height=48,
                     gradient= gradient_colors,
-                    on_click= lambda e: print('guardar orden de mantenimiento'),
+                    on_click= lambda e: print(f'Equipo: {selected_equipment}, Técnicos: {selected_technicians}'),
                 )
             ],
             alignment=ft.MainAxisAlignment.CENTER,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=10
+            spacing=10,
         ),
         alignment=ft.alignment.center,
         expand=True
