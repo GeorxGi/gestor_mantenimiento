@@ -16,9 +16,9 @@ class EquipmentSQL(BaseSqlController):
             params= (code, name, description, provider))
 
     def get_by_partial_name(self, name:str) -> list[dict]:
+        """Metodo que retorna todas las instancias posibles en base a un nombre parcial"""
         if not name:
             return self.get_all_equipments()
-        """Metodo que retorna todas las instancias posibles en base a un nombre parcial"""
         query= f"SELECT * FROM {self.table()} WHERE LOWER(name) LIKE ?"
         params = (f"%{name.lower()}%",)
         rows = self._fetchall(query= query, params= params)
@@ -30,9 +30,9 @@ class EquipmentSQL(BaseSqlController):
         return [dict(row) for row in rows]
 
     def delete_by_code(self, equipment_code:str) -> bool:
+        """Elimina de la tabla el elemento con el id ingresado"""
         if not equipment_code:
             return False
-        """Elimina de la tabla el elemento con el id ingresado"""
         return self._execute(
             query= f"DELETE FROM {self.table()} WHERE code = ?",
             params= (equipment_code,)

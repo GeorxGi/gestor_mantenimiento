@@ -16,9 +16,9 @@ from src.controllers.sql.maintenance_sql import MaintenanceSQL
 
 from src.models.maintenance import Maintenance
 
-def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_technicians_id:list[str], name:str, details:str, maintenance_date:date) -> CreateMaintenanceCases:
+def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_technicians_id:list[str], details:str, maintenance_date:date) -> CreateMaintenanceCases:
     #Verifica que los datos de entrada no estén vacios
-    if not equipment_code or not supervisor_id or not asigned_technicians_id or not name or not details or not maintenance_date:
+    if not equipment_code or not supervisor_id or not asigned_technicians_id or not details or not maintenance_date:
         return CreateMaintenanceCases.EMPTY_IMPUT
 
     # Verifica que el id del equipo ingresado exista
@@ -27,10 +27,12 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
 
     with UserSQL() as db:
         in_db_technicians = db.fetchall_by_id(asigned_technicians_id)
+        supervisor_row = db.fetch_user_by_id(supervisor_id)
 
     #Verifica que los tecnicos ingresados no tengan un mantenimiento asignado
     for technician in in_db_technicians:
-        if technician.get("assigned_maintenance_id", "") != "":
+        value = technician.get("assigned_maintenance_id", "")
+        if value is not None:
             return CreateMaintenanceCases.BUSY_TECHNICIAN
 
         #Verifica que los tecnicos ingresados si cumplan con ese rol (no sean supervisor por ejemplo)
@@ -43,7 +45,6 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
         return CreateMaintenanceCases.NOT_REGISTERED_ID
 
     #Verifica que el supervisor ingresado si cumpla con ese rol (no sea tecnico por ejemplo)
-    supervisor_row = db.fetch_user_by_id(supervisor_id)
     super_access_level = AccessLevel.from_string(supervisor_row.get("access_level", ""))
     if super_access_level != AccessLevel.SUPERVISOR:
         return CreateMaintenanceCases.SUPERVISOR_ID_IS_NOT_SUPERVISOR
@@ -98,12 +99,18 @@ def get_supervisor_pending_maintenances(supervisor_id:str) -> list[Maintenance]:
         pending_maintenances = db.fetchall_supervisor_pending_maintenances(supervisor_id)
         return pending_maintenances
 
+def get_maintenance_basic_info(maintenance_id:str) -> dict | None:
+    """Retorna un diccionario con los campos description, date y equipment_name en caso de haber encontrado el mantenimiento"""
+    if not maintenance_id:
+        return None
+    with MaintenanceSQL() as db:
+        return db.fetch_maintenance_basic_info(maintenance_id)
+
 if __name__ == '__main__':
     print (create_maintenance_order(
         supervisor_id= "8a9169c5-e722-4c29-97bf-e8fd9c9b270f",
         maintenance_date= date.today(),
         details= "Mantenimiento de prueba",
-        name= "Arreglar lavadora",
         asigned_technicians_id= ["285ee627-4d20-4312-869f-adf60bf918d6", "bde87a67-afe8-42e7-8656-2b79779cee0b"],
         equipment_code= "23GH12"
     ).value)

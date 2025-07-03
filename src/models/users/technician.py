@@ -4,9 +4,9 @@ from src.models.users.user import User
 from src.enums.access_level import AccessLevel
 
 class Technician(User):
-    def __init__(self, *, working_area:str = '', **kwargs):
+    def __init__(self, *, assigned_maintenance_id:str = '', working_area:str = '', **kwargs):
         super().__init__(**kwargs)
-        self.assigned_maintenance_id:str = ''
+        self.assigned_maintenance_id:str = assigned_maintenance_id
         self.working_area:str = working_area
 
     def asign_work(self, work_id:str):
@@ -18,6 +18,7 @@ class Technician(User):
 
         user_instante.__class__ = cls
         user_instante.working_area = data.get("working_area", "")
+        user_instante.assigned_maintenance_id =data.get("assigned_maintenance_id")
         return user_instante
 
     def to_simple_dict(self) -> dict:

@@ -7,11 +7,9 @@ from src.consts.colors import gradient_colors
 
 
 def global_app_bar(page: ft.Page, access_level:AccessLevel) -> ft.AppBar:
-    print(f"DEBUG AppBar - Access level recibido: '{access_level}'")
-    
+
     actions = []
     if access_level == AccessLevel.SUPERVISOR:
-        print("DEBUG AppBar - Agregando botón de mensajes para supervisor")
         actions = [
             ft.IconButton(
                 icon=ft.Icons.MESSAGE_OUTLINED,

@@ -85,7 +85,7 @@ class UserSQL(BaseSqlController):
                 WHERE id IN ({placeholder})
                 AND access_level = ?
                 """,
-            params= (maintenance_id, tech_id, AccessLevel.TECHNICIAN.name)
+            params= (maintenance_id, *tech_id, AccessLevel.TECHNICIAN.name)
         )
 
 if __name__ == '__main__':

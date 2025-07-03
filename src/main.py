@@ -16,6 +16,7 @@ def main(page: ft.Page):
     page.bgcolor = ft.Colors.GREY_100
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.on_disconnect = lambda _: listening_sessions.pop(page.session_id, None)
+    print("new_session:", page.session_id)
 
     def route_change(_):
         #Evita que se intente duplicar una página

@@ -15,11 +15,21 @@ class Maintenance:
         data["maintenance_date"] = str(self.maintenance_date)
         return data
 
+    @staticmethod
+    def get_date_by_string(datestr:str) -> date | None:
+        try:
+            date_obj = datetime.strptime(datestr, "%d-%m-%Y").date()
+            if not date_obj:
+                date_obj = datetime.strptime(datestr, "%Y-%m-%d").date()
+            return date_obj
+        except Exception:
+            return None
+
     @classmethod
     def from_dict(cls, data:dict):
         date_str = data.get("maintenance_date", "")
         if date_str:
-            fecha_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+            fecha_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
         else:
             return None
 
