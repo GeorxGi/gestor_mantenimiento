@@ -28,10 +28,12 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
     with UserSQL() as db:
         in_db_technicians = db.fetchall_by_id(asigned_technicians_id)
 
+    #Verifica que los tecnicos ingresados no tengan un mantenimiento asignado
     for technician in in_db_technicians:
         if technician.get("assigned_maintenance_id", "") != "":
             return CreateMaintenanceCases.BUSY_TECHNICIAN
 
+        #Verifica que los tecnicos ingresados si cumplan con ese rol (no sean supervisor por ejemplo)
         technician_access_level = AccessLevel.from_string(technician.get("access_level", ""))
         if technician_access_level != AccessLevel.TECHNICIAN:
             return CreateMaintenanceCases.TECHNICIAN_ID_IS_NOT_TECHNICIAN
@@ -40,14 +42,17 @@ def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_t
     if len(in_db_technicians) != len(asigned_technicians_id):
         return CreateMaintenanceCases.NOT_REGISTERED_ID
 
+    #Verifica que el supervisor ingresado si cumpla con ese rol (no sea tecnico por ejemplo)
     supervisor_row = db.fetch_user_by_id(supervisor_id)
     super_access_level = AccessLevel.from_string(supervisor_row.get("access_level", ""))
     if super_access_level != AccessLevel.SUPERVISOR:
         return CreateMaintenanceCases.SUPERVISOR_ID_IS_NOT_SUPERVISOR
 
+    #Verifica que la fecha de mantenimiento no sea menor a la fecha de hoy
     if maintenance_date < date.today():
         return CreateMaintenanceCases.NOT_VALID_DATE
 
+    #A partir de aquí es almacenar en la base de datos
     new_maintenance = Maintenance(
         supervisor_id= supervisor_id,
         maintenance_id= str(uuid.uuid4()),

@@ -34,9 +34,10 @@ def process_and_store_image(image_bytes, output_path:str):
         return False
 
 def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
-    #Validación de datos
+    #Valida que no se hayan ingresado datos en blanco
     if not name or not amount:
         return CreateSpareCases.EMPTY_INPUT
+    #Valida que no se intenten almacenar cero piezas en la DB
     if amount < 0:
         return CreateSpareCases.INVALID_AMOUNT
 

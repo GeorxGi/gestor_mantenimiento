@@ -16,35 +16,39 @@ from src.controllers.user.session_controller import register_user
 class RegisterView:
     def __init__(self, page: ft.Page):
         self.page = page
+        self.fullname_text_field = CustomTextField(
+            hint_label= 'Nombre completo',
+            width= 350,
+            icon= ft.Icons.PERSON,
+            on_submit= lambda _: self.email_text_field.focus()
+        )
         self.email_text_field = CustomTextField(
             hint_label= "Correo electrónico",
             width= 350,
-            icon= ft.Icons.EMAIL
-        )
-        self.fullname_text_field = CustomTextField(
-        hint_label= 'Nombre completo',
-        width= 350,
-        icon= ft.Icons.PERSON
+            icon= ft.Icons.EMAIL,
+            on_submit= lambda _: self.username_text_field.focus()
         )
         self.username_text_field = CustomTextField(
             hint_label= "Usuario",
             width= 350,
             icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
+            on_submit= lambda _: self.password_text_field.focus()
         )
         self.password_text_field = CustomTextField(
             hint_label= "Contraseña",
             width= 350,
             icon= ft.Icons.HTTPS,
             is_pass= True,
+            on_submit= lambda _: self.access_level_DropDown.focus()
         )
         self.access_level_DropDown = ft.Dropdown(
             width= 350,
             hint_text= "Nivel de acceso",
             leading_icon=ft.Icon(ft.Icons.SUPERVISOR_ACCOUNT),
             options= [
-                ft.dropdown.Option(text= "Administrador", key= AccessLevel.ADMIN.value),
-                ft.dropdown.Option(text="Supervisor", key= AccessLevel.SUPERVISOR.value),
-                ft.dropdown.Option(text= "Técnico", key= AccessLevel.TECHNICIAN.value),
+                ft.dropdown.Option(text= "Administrador", key= str(AccessLevel.ADMIN.value)),
+                ft.dropdown.Option(text="Supervisor", key= str(AccessLevel.SUPERVISOR.value)),
+                ft.dropdown.Option(text= "Técnico", key= str(AccessLevel.TECHNICIAN.value)),
             ],
             color= ft.Colors.GREY_500,
             border_color= ft.Colors.GREY_300,

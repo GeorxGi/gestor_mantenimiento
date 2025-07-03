@@ -15,21 +15,21 @@ def register_user(*, fullname:str, username:str, password:str, email: str, acces
     #Valida que el nombre de usuario y contraseña no esten vacios
     if not fullname or not username or not password or not email or not access_level:
         return RegisterCases.EMPTY_INPUT
-
+    #Verifica que el access_level ingresado sea parte del enum
     if not isinstance(access_level, AccessLevel):
         return RegisterCases.INVALID_ACCESS_LEVEL
-
+    #Verifica que la contraseña cumpla con los requisitos (1 mayus, 1 minus, 1 num)
     if not password_is_secure(password):
         return RegisterCases.INVALID_PASSWORD
-
+    #Verifica que el correo tenga formato válido
     if not is_valid_mail(email):
         return RegisterCases.INVALID_EMAIL
-
+    #Verifica que el nombre de usuario ingresado no esté ocupado
     if _username_is_taken(username):  # Si el usuario ya existe, no se puede registrar
         return RegisterCases.USERNAME_TAKEN
-
+    #Encripta la contraseña ingresada
     hashed_password = hash_password(password)
-
+    #Almacena en la DB
     with UserSQL() as db:
         db.create_user(
             username= username,

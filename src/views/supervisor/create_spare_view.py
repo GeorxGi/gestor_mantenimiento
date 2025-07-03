@@ -5,7 +5,7 @@ from src.widgets.input_form import input_form
 
 from src.consts.colors import gradient_colors, middle_color
 
-def create_piece_view(page:ft.Page, on_success=None):
+def create_spare_view(page:ft.Page, on_success=None):
     code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2)
     quantity_input = input_form(label="Cantidad", icon=ft.Icons.NUMBERS)
 

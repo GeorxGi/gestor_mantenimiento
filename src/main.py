@@ -5,6 +5,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent))
 import flet as ft
 
 from src.controllers.sql.base_sql import BaseSqlController
+from src.utils.notification_handler import listening_sessions
 
 def main(page: ft.Page):
     BaseSqlController.init_db()
@@ -14,8 +15,7 @@ def main(page: ft.Page):
     page.window.height = 900
     page.bgcolor = ft.Colors.GREY_100
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
-    page.on_disconnect = lambda _: print("Sesión cerrada:", page.session_id)
-    print("Nueva sesión: ", page.session_id)
+    page.on_disconnect = lambda _: listening_sessions.pop(page.session_id, None)
 
     def route_change(_):
         #Evita que se intente duplicar una página

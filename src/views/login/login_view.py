@@ -21,12 +21,14 @@ class LoginView:
             hint_label= "Usuario",
             width= 350,
             icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
+            on_submit= lambda _: self.password_text_field.focus()
         )
         self.password_text_field = CustomTextField(
             hint_label= "Contraseña",
             width= 350,
             icon= ft.Icons.HTTPS,
             is_pass= True,
+            on_submit= lambda _: self._login()
         )
         self.main_view_container = ft.Container(
             height=400,
@@ -75,7 +77,7 @@ class LoginView:
             return
         else:
             self.page.session.set(key= "local_user",value=  user.to_dict())
-            self.page.session.set("welcome_shown", False)  # Reset welcome flag
+            self.page.session.set(key= "welcome_shown",value= False)  # Reset welcome flag
             self.page.go('dashboard')
 
     def build(self) -> ft.View:
