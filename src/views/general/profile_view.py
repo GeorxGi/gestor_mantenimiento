@@ -19,7 +19,7 @@ def profile_set(page: ft.Page) -> ft.Container:
         return ft.Container(
             alignment= ft.alignment.center_left,
             expand= True,
-            margin= 10,
+            margin= 5,
             content= ft.Column(
                 horizontal_alignment= ft.CrossAxisAlignment.START,
                 spacing=2,
@@ -68,7 +68,6 @@ def profile_set(page: ft.Page) -> ft.Container:
         horizontal_alignment= ft.alignment.center,
         controls= [
             ft.Container(
-                expand= True,
                 alignment= ft.alignment.center,
                 content= ft.Text(
                     value= "Mantenimiento pendiente",
@@ -81,7 +80,6 @@ def profile_set(page: ft.Page) -> ft.Container:
             info_line(label= "Equipo", value= maintenance_info.get("equipment_name", "")),
             info_line(label= "Fecha mantenimiento", value= maintenance_info.get("date", "")),
             info_line(label= "Detalles", value= maintenance_info.get("details", "")),
-            ft.Divider(),
         ]
     ) if maintenance_info else ft.Container()
 
@@ -150,15 +148,23 @@ def profile_set(page: ft.Page) -> ft.Container:
                         ]
                     ),
                     ft.Divider(),
-                    maintenance_column,
-                    ft.Button(
-                        text= 'Cerrar sesión',
-                        height= 50,
-                        width= 150,
-                        on_click= try_to_logout,
-                        icon= ft.Icons.LOGOUT,
-                        color= ft.Colors.WHITE,
-                        bgcolor= ft.Colors.RED_400
+                    ft.Stack(
+                        alignment= ft.alignment.bottom_right,
+                        controls= [
+                            maintenance_column,
+                            ft.Container(
+                                margin= 10,
+                                content= ft.Button(
+                                    text= 'Cerrar sesión',
+                                    height= 50,
+                                    width= 150,
+                                    on_click= try_to_logout,
+                                    icon= ft.Icons.LOGOUT,
+                                    color= ft.Colors.WHITE,
+                                    bgcolor= ft.Colors.RED_400
+                                ),
+                            ),
+                        ]
                     ),
                     grey_band,
                 ]

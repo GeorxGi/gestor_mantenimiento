@@ -1,8 +1,6 @@
 import flet as ft
-from src.controllers.equipment_controller import get_all_equipments, get_equipment
-from src.controllers.sql.equipment_sql import EquipmentSQL
-from src.controllers.sql.user_sql import UserSQL
-from src.enums.access_level import AccessLevel
+from src.controllers.equipment_controller import get_equipment_by_partial_name
+from src.controllers.user.user_controller import get_all_available_technicians
 
 from src.consts.colors import *
 
@@ -21,36 +19,32 @@ def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_selec
         else:
             selected_id = item_id
         update_list(search_bar.value)
-        print(f'Seleccionado: {item_id if not multi_select else list(selected_ids)}')
-    
+
     def update_list(search_text=""):
         item_list.controls.clear()
         
         if list_type == "equipment":
-            with EquipmentSQL() as db:
-                items = db.get_by_partial_name(search_text)
-            
+            items = get_equipment_by_partial_name(search_text)
             for item in items:
-                is_selected = (selected_id == item['code']) if not multi_select else (item['code'] in selected_ids)
+                is_selected = (selected_id == item.code) if not multi_select else (item.code in selected_ids)
                 item_list.controls.append(
                     ft.ListTile(
                         leading=ft.Icon(ft.Icons.PRECISION_MANUFACTURING),
-                        title=ft.Text(item['name']),
-                        subtitle=ft.Text(f"Código: {item['code']} - {item['description']}"),
+                        title=ft.Text(item.name),
+                        subtitle=ft.Text(f"Código: {item.code} - {item.description}"),
                         trailing=ft.Icon(ft.Icons.CHECK if is_selected else ft.Icons.ARROW_FORWARD_IOS),
                         bgcolor=ft.Colors.BLUE_100 if is_selected else None,
-                        on_click=lambda e, code=item['code']: select_item(code)
+                        on_click=lambda e, code=item.code: select_item(code)
                     )
                 )
         
         elif list_type == "technician":
-            with UserSQL() as db:
-                items = db.fetch_by_access_level(AccessLevel.TECHNICIAN)
-                if search_text:
-                    items = [item for item in items if search_text.lower() in item['fullname'].lower()]
+            items = get_all_available_technicians()
+            if search_text:
+                items = [item for item in items if search_text.lower() in item.fullname.lower()]
             
             for item in items:
-                is_selected = (selected_id == item['id']) if not multi_select else (item['id'] in selected_ids)
+                is_selected = (selected_id == item.id) if not multi_select else (item.id in selected_ids)
                 item_list.controls.append(
                     ft.ListTile(
                         leading=ft.CircleAvatar(
@@ -59,11 +53,11 @@ def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_selec
                             color= ft.Colors.WHITE
                             ),
 
-                        title=ft.Text(item['fullname']),
-                        subtitle=ft.Text(f"Email: {item['email']}"),
+                        title=ft.Text(item.fullname),
+                        subtitle=ft.Text(f"Email: {item.email}"),
                         trailing=ft.Icon(ft.Icons.CHECK if is_selected else ft.Icons.ARROW_FORWARD_IOS),
                         bgcolor=ft.Colors.BLUE_100 if is_selected else None,
-                        on_click=lambda e, user_id=item['id']: select_item(user_id)
+                        on_click=lambda _, user_id=item.id: select_item(user_id)
                     )
                 )
         
@@ -94,14 +88,14 @@ def list_window(text: str, page: ft.Page, list_type: str = "equipment", on_selec
         ),
         actions=[
             ft.ElevatedButton(
-                "Seleccionar",
+                text= "Seleccionar",
                 on_click=lambda e: confirm_selection(),
                 bgcolor= middle_color,
                 color = ft.Colors.WHITE,
                 width=100
             ),
             ft.ElevatedButton(
-                "Cerrar",
+                text= "Cerrar",
                 on_click=lambda e: close_dialog(),
                 bgcolor= ft.Colors.RED_300,
                 color = ft.Colors.WHITE,

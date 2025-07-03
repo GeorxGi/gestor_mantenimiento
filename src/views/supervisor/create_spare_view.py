@@ -1,39 +1,87 @@
-import flet as ft   
+import base64
 
+import flet as ft
+
+from src.widgets.custom_snack_bar import custom_snack_bar
 from src.widgets.gradient_button import gradient_button
 from src.widgets.input_form import input_form
 
 from src.consts.colors import gradient_colors, middle_color
 
+from src.controllers.spare_controller import add_spare
+from src.enums.create_spare_cases import CreateSpareCases
+
 def create_spare_view(page:ft.Page, on_success=None):
-    
-    def pick_image(e):
+    picked_image_bytes = None
+
+    def register_spare():
+        quantity  = 0
+        if quantity_input.value.isnumeric():
+            quantity = int(quantity_input.value)
+        result = add_spare(
+            name= name_input.value,
+            amount= quantity,
+            image_bytes= picked_image_bytes
+        )
+        page.open(custom_snack_bar(content= result.value))
+        if result == CreateSpareCases.CORRECT:
+            if on_success:
+                on_success()
+
+    def pick_image(_):
         file_picker.pick_files(
             allow_multiple=False,
-            allowed_extensions=["png", "jpg", "jpeg", "gif", "bmp"]
+            allowed_extensions=["png", "jpg", "jpeg", "bmp"],
         )
-    
+
     def on_file_picked(e: ft.FilePickerResultEvent):
+        nonlocal picked_image_bytes
+
         if e.files:
             selected_file = e.files[0]
-            container_img_piece.content = ft.Image(
-                src=selected_file.path,
-                width=150,
-                height=150,
-                fit=ft.ImageFit.COVER
-            )
+            picked_image_bytes = getattr(selected_file, "bytes", None)
+
+            # Si no hay bytes, intenta leer desde el path
+            if picked_image_bytes is None and hasattr(selected_file, "path") and selected_file.path:
+                try:
+                    with open(selected_file.path, "rb") as f:
+                        picked_image_bytes = f.read()
+                except Exception as ex:
+                    page.open(custom_snack_bar(content=f"Error al leer la imagen: {ex}"))
+                    page.update()
+                    return
+
+            if picked_image_bytes:
+                image_preview.content = ft.Image(
+                    src_base64=base64.b64encode(picked_image_bytes).decode("utf-8"),
+                    width=150,
+                    height=150,
+                    fit=ft.ImageFit.COVER
+                )
+            else:
+                page.open(custom_snack_bar(content="Ocurrió un error a la hora de cargar la imágen"))
             page.update()
     
     file_picker = ft.FilePicker(on_result=on_file_picked)
     page.overlay.append(file_picker)
+
+    picked_file: None | bytes = None
     
-    code_input = input_form(label="numero ai de bd", icon=ft.Icons.QR_CODE_2)
+    code_input = input_form(label="Código de pieza", icon=ft.Icons.QR_CODE_2)
     code_input.disabled = True
     
-    name_input = input_form(label="Nombre", icon=ft.Icons.EDIT_ROUNDED)
-    # Luis: no se si necesitas la cantidad para registrar la pieza, o de por si la cantidad = 0 de manera predeterminada
-    quantity_input = input_form(label="Cantidad", icon=ft.Icons.NUMBERS)
-    quantity_input.visible = False
+    name_input = input_form(
+        label="Nombre",
+        icon=ft.Icons.EDIT_ROUNDED)
+    quantity_input = input_form(
+        label="Cantidad",
+        icon=ft.Icons.NUMBERS,
+        keyboard_type= ft.KeyboardType.NUMBER,
+        input_filter= ft.InputFilter(
+            allow= True,
+            regex_string= r"^[0-9]*$"
+        )
+    )
 
     title_form = ft.Column(
         controls = [
@@ -55,7 +103,7 @@ def create_spare_view(page:ft.Page, on_success=None):
         spacing= 10
     )
     
-    container_img_piece = ft.Container(
+    image_preview = ft.Container(
         width= 150,
         height= 150,
         bgcolor= ft.Colors.GREY_300,
@@ -72,7 +120,7 @@ def create_spare_view(page:ft.Page, on_success=None):
         controls=[
             ft.Container(
             height=150,
-                content=container_img_piece,
+                content=image_preview,
                 alignment=ft.alignment.center
             ),
             ft.Container(
@@ -103,14 +151,15 @@ def create_spare_view(page:ft.Page, on_success=None):
                 title_form,
                 row_image,
                 code_input,
-                name_input,
                 quantity_input,
+                name_input,
             ]
         )
     )
     
     return ft.Container(
         content = ft.Column(
+            scroll= ft.ScrollMode.AUTO,
             controls=[
                 container_form,
                 gradient_button(
@@ -118,7 +167,7 @@ def create_spare_view(page:ft.Page, on_success=None):
                     width=300,
                     height=48,
                     gradient= gradient_colors,
-                    on_click= lambda e: print('guarda pieza'),
+                    on_click= lambda _: register_spare()
                 ),
             ],
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,

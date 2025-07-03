@@ -1,6 +1,7 @@
 from src.controllers.sql.base_sql import BaseSqlController
 from src.controllers.sql.equipment_sql import EquipmentSQL
 from src.models.maintenance import Maintenance
+from src.controllers.sql.user_sql import UserSQL
 
 class MaintenanceSQL(BaseSqlController):
     def table(self):
@@ -11,7 +12,7 @@ class MaintenanceSQL(BaseSqlController):
         return "maintenance_technicians"
 
     def create_maintenance_order(self, new_maintenance:Maintenance) -> bool:
-        """Almacena la nueva orden de mantenimiento en la database"""
+        """Almacena la nueva orden de mantenimiento en la base de datos"""
         first_query = self._execute(
             query= f"INSERT INTO {self.table()} "
                    f"(id, supervisor_id, equipment_code, maintenance_date, is_pending, details) "
@@ -38,12 +39,14 @@ class MaintenanceSQL(BaseSqlController):
         return True
 
     def fetchall_supervisor_pending_maintenances(self, supervisor_id:str):
+        """Obtiene todos los mantenimientos pendientes de un supervisor"""
         return self._fetchall(
             query= f"SELECT * FROM {self.table()} WHERE supervisor_id = ? AND is_pending = TRUE",
             params= (supervisor_id, )
         )
 
     def fetchall_technicians_in_maintenance(self, maintenance_id:str) -> list[str]:
+        """Obtiene el id de todos los técnicos asignados a un mantenimiento"""
         if not maintenance_id:
             return []
         value = self._fetchall(
@@ -53,6 +56,7 @@ class MaintenanceSQL(BaseSqlController):
         return [row for row in value]
 
     def fetch_maintenance_basic_info(self, maintenance_id:str) -> dict:
+        """Devuelve datos básicos sobre un mantenimiento como detalles, fecha y nombre del equipo)"""
         query = f"""
             SELECT m.details, m.maintenance_date, e.name
             FROM {self.table()} m
@@ -70,6 +74,7 @@ class MaintenanceSQL(BaseSqlController):
             }
 
     def equipment_has_pending_maintenance(self, equipment_code:str) -> bool:
+        """Indica si el equipo ingresado posee un mantenimiento pendiente o no"""
         has_maintenance = self._fetchone(
             query= f"SELECT 1 FROM {self.table()} WHERE equipment_id = ?",
             params= (equipment_code,)
@@ -79,12 +84,36 @@ class MaintenanceSQL(BaseSqlController):
     def set_maintenance_no_longer_pending(self, maintenance_id:str) -> bool:
         """Establece el estado del mantenimiento a no pendiente y retorna un booleano que indica si
         la fila fue modificada exitosamente"""
-        if not maintenance_id:
-            return False
         return self._execute(
             query= f"UPDATE {self.table()} SET is_pending = 0 WHERE id = ?",
             params= (maintenance_id, )
         )
+
+    def fetchall_technician_maintenances(self, technician_id:str) -> list[dict]:
+        """Obtiene una lista con el historial de todos los mantenimientos de un técnico con datos como
+        nombre del supervisor que lo asigno, detalles, fecha de mantenimiento y estado (pendiente o completado)"""
+        query= f"""
+            SELECT
+            u.fullname AS supervisor_name,
+            m.details,
+            m.maintenance_date,
+            m.is_pending
+            FROM {self.table()} m
+            INNER JOIN {self.second_table()} mt ON mt.maintenance_id = m.id
+            INNER JOIN {UserSQL().table()} u ON u.id = m.supervisor_id
+            WHERE mt.technician_id = ?
+            ORDER BY m.maintenance_date DESC
+        """
+        rows = self._fetchall(query= query, params= (technician_id, ))
+        return [
+            {
+                "supervisor": row[0],
+                "details": row[1],
+                "date": row[2],
+                "status": "Pendiente" if row[3] else "Completado"
+            }
+            for row in rows
+        ]
 
 if __name__ == '__main__':
     with MaintenanceSQL() as db:
