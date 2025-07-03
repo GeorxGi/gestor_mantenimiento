@@ -1,13 +1,11 @@
 import sqlite3
-from pathlib import Path
 from abc import ABC, abstractmethod
+from src.consts.file_dir import DB_PATH, DB_SCHEMA_PATH
 
 class BaseSqlController(ABC):
-    _DB_PATH = Path(__file__).parent.parent.parent / "data" / "local_storage.db"
-    _SCHEMA_PATH = Path(__file__).parent / "schema.sql"
 
     def __init__(self):
-        self.connection = sqlite3.connect(self._DB_PATH)
+        self.connection = sqlite3.connect(DB_PATH)
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
@@ -39,10 +37,11 @@ class BaseSqlController(ABC):
 
     @staticmethod
     def init_db():
-        if not BaseSqlController._SCHEMA_PATH.exists():
+        DB_PATH.parent.mkdir(parents=True, exist_ok= True)
+        if not DB_SCHEMA_PATH.exists():
             raise FileNotFoundError("Archivo schema.sql no encontrado")
-        with sqlite3.connect(BaseSqlController._DB_PATH) as conn:
-            with open(BaseSqlController._SCHEMA_PATH, "r", encoding="utf-8") as f:
+        with sqlite3.connect(DB_PATH) as conn:
+            with open(DB_SCHEMA_PATH, "r", encoding="utf-8") as f:
                 conn.executescript(f.read())
 
     @abstractmethod

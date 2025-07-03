@@ -1,6 +1,5 @@
 import flet as ft
 
-from src.enums.access_level import AccessLevel
 from src.utils.routes import register_view
 
 from src.widgets.gradient_text import gradient_text
@@ -18,6 +17,53 @@ def _forgot_password():
 class LoginView:
     def __init__(self, page: ft.Page):
         self.page = page
+        self.username_text_field = CustomTextField(
+            hint_label= "Usuario",
+            width= 350,
+            icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
+            on_submit= lambda _: self.password_text_field.focus()
+        )
+        self.password_text_field = CustomTextField(
+            hint_label= "Contraseña",
+            width= 350,
+            icon= ft.Icons.HTTPS,
+            is_pass= True,
+            on_submit= lambda _: self._login()
+        )
+        self.main_view_container = ft.Container(
+            height=400,
+            bgcolor=ft.Colors.WHITE,
+            border_radius=ft.border_radius.all(20),
+            border=ft.border.all(1, ft.Colors.GREY_200),
+            content=ft.Column(
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing= 10,
+                controls= [
+                    gradient_text(
+                        text="HAC",
+                        size=80,
+                        text_weight= ft.FontWeight.BOLD,
+                        gradient=gradient_colors,
+                    ),
+                    ft.Container(
+                        alignment=ft.alignment.center,
+                        margin=ft.margin.only(bottom=20),
+                        content=ft.Text(
+                            value= "¡Bienvenido!",
+                            size=15,
+                            color=ft.Colors.GREY_500),
+                    ),
+                    self.username_text_field,
+                    self.password_text_field,
+                    ft.TextButton(
+                        text="Olvidé mi contraseña",
+                        icon_color=ft.Colors.BLUE,
+                        on_click= lambda e: _forgot_password()
+                    ),
+                ],
+            ),
+        )
 
     def _login(self):
         username = self.username_text_field.value
@@ -31,54 +77,8 @@ class LoginView:
             return
         else:
             self.page.session.set(key= "local_user",value=  user.to_dict())
-            self.page.session.set("welcome_shown", False)  # Reset welcome flag
+            self.page.session.set(key= "welcome_shown",value= False)  # Reset welcome flag
             self.page.go('dashboard')
-
-    username_text_field = CustomTextField(
-        hint_label= "Usuario",
-        width= 350,
-        icon= ft.Icons.ACCOUNT_CIRCLE_ROUNDED,
-    )
-    password_text_field = CustomTextField(
-        hint_label= "Contraseña",
-        width= 350,
-        icon= ft.Icons.HTTPS,
-        is_pass= True,
-    )
-    _main_view_container = ft.Container(
-        height=400,
-        bgcolor=ft.Colors.WHITE,
-        border_radius=ft.border_radius.all(20),
-        border=ft.border.all(1, ft.Colors.GREY_200),
-        content=ft.Column(
-            alignment=ft.MainAxisAlignment.CENTER,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing= 10,
-            controls= [
-                gradient_text(
-                    text="HAC",
-                    size=80,
-                    text_weight= ft.FontWeight.BOLD,
-                    gradient=gradient_colors,
-                ),
-                ft.Container(
-                    alignment=ft.alignment.center,
-                    margin=ft.margin.only(bottom=20),
-                    content=ft.Text(
-                    value= "¡Bienvenido!",
-                        size=15,
-                        color=ft.Colors.GREY_500),
-                ),
-                username_text_field,
-                password_text_field,
-                ft.TextButton(
-                    text="Olvidé mi contraseña",
-                    icon_color=ft.Colors.BLUE,
-                    on_click= lambda e: _forgot_password()
-                ),
-            ],
-        ),
-    )
 
     def build(self) -> ft.View:
         """Inicializar la interfaz de login"""
@@ -94,7 +94,7 @@ class LoginView:
                     size=30,
                     color=ft.Colors.GREY
                 ),
-                self._main_view_container,
+                self.main_view_container,
                 gradient_button(
                     text= 'Iniciar sesión',
                     width=300,

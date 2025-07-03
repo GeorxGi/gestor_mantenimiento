@@ -1,6 +1,11 @@
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 import flet as ft
 
 from src.controllers.sql.base_sql import BaseSqlController
+from src.utils.notification_handler import listening_sessions
 
 def main(page: ft.Page):
     BaseSqlController.init_db()
@@ -10,10 +15,9 @@ def main(page: ft.Page):
     page.window.height = 900
     page.bgcolor = ft.Colors.GREY_100
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.on_disconnect = lambda _: listening_sessions.pop(page.session_id, None)
 
-    def route_change(e):
-        print(f"Moviendo la ruta a: {page.route}")
-
+    def route_change(_):
         #Evita que se intente duplicar una página
         if page.views and page.views[-1].route == page.route:
             return
@@ -26,7 +30,7 @@ def main(page: ft.Page):
         page.views.append(view)
         page.update()
 
-    def view_pop(e):
+    def view_pop(_):
         if len(page.views) > 1:
             page.views.pop()
             page.go(page.views[-1].route)

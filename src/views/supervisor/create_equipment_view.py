@@ -1,6 +1,7 @@
 import flet as ft
 
 from src.enums.create_equipment_cases import CreateEquipmentCases
+
 from src.widgets.custom_snack_bar import custom_snack_bar
 from src.widgets.gradient_button import gradient_button
 from src.widgets.input_form import input_form
@@ -8,7 +9,7 @@ from src.widgets.input_form import input_form
 from src.consts.colors import gradient_colors, middle_color
 
 from src.controllers.equipment_controller import create_equipment
-            
+
 def create_equipment_view(page: ft.Page, on_success = None):
     code_input = input_form(label="Codigo", icon=ft.Icons.QR_CODE_2)
     name_input = input_form(label="Nombre", icon=ft.Icons.CREATE)
@@ -23,6 +24,7 @@ def create_equipment_view(page: ft.Page, on_success = None):
             code= code_input.value
         )
         if response == CreateEquipmentCases.CORRECT:
+            page.open(custom_snack_bar(content=str(response.value)))
             if on_success:
                 on_success()
         else:

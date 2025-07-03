@@ -35,3 +35,9 @@ CREATE TABLE IF NOT EXISTS equipments (
     description TEXT NOT NULL,
     provider TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS spare_inventory (
+    code INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    amount INTEGER NOT NULL DEFAULT 0
+)

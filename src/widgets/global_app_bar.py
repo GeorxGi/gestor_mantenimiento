@@ -1,15 +1,16 @@
 import flet as ft
 
+from src.enums.access_level import AccessLevel
 from src.widgets.gradient_text import gradient_text
 from src.consts.colors import gradient_colors
 
 
 
-def global_app_bar(page: ft.Page, access_level: str) -> ft.AppBar:
+def global_app_bar(page: ft.Page, access_level:AccessLevel) -> ft.AppBar:
     print(f"DEBUG AppBar - Access level recibido: '{access_level}'")
     
     actions = []
-    if access_level == "SUPERVISOR":
+    if access_level == AccessLevel.SUPERVISOR:
         print("DEBUG AppBar - Agregando botón de mensajes para supervisor")
         actions = [
             ft.IconButton(
@@ -20,7 +21,7 @@ def global_app_bar(page: ft.Page, access_level: str) -> ft.AppBar:
             )
         ]
     else:
-        print(f"DEBUG AppBar - No es supervisor, es: '{access_level}'")
+        print(f"DEBUG AppBar - No es supervisor, es: '{access_level.value}'")
     
     return ft.AppBar(
         automatically_imply_leading=False,

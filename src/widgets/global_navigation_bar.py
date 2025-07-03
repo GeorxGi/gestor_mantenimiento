@@ -1,8 +1,10 @@
 import flet as ft
 
 from src.consts.colors import *
+from src.enums.access_level import AccessLevel
 
-def global_navigation_bar(page: ft.Page, access_level: str, on_change_callback) -> ft.NavigationBar:
+
+def global_navigation_bar(page: ft.Page, access_level: AccessLevel, on_change_callback) -> ft.NavigationBar:
     destinations = [
         ft.NavigationBarDestination(
             icon=ft.Icons.HOME_OUTLINED,
@@ -17,7 +19,7 @@ def global_navigation_bar(page: ft.Page, access_level: str, on_change_callback) 
     ]
     
     # Solo supervisores pueden agregar
-    if access_level == "SUPERVISOR":
+    if access_level == AccessLevel.SUPERVISOR:
         destinations.insert(1, ft.NavigationBarDestination(
             icon=ft.Container(
                 content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
