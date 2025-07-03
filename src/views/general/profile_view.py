@@ -62,7 +62,7 @@ def profile_set(page: ft.Page) -> ft.Container:
             content=ft.Text(access_level.name, size=20, weight=ft.FontWeight.W_700, color=color_by_access)
         )
 
-    grey_band = ft.Container(height=40, bgcolor= ft.Colors.BLUE_GREY_700)
+    grey_band = ft.Container(height=40, bgcolor= ft.Colors.BLUE_GREY_700, expand= True)
 
     maintenance_column = ft.Column(
         horizontal_alignment= ft.alignment.center,
@@ -80,7 +80,6 @@ def profile_set(page: ft.Page) -> ft.Container:
             info_line(label= "Equipo", value= maintenance_info.get("equipment_name", "")),
             info_line(label= "Fecha mantenimiento", value= maintenance_info.get("date", "")),
             info_line(label= "Detalles", value= maintenance_info.get("details", "")),
-            ft.Divider(),
         ]
     ) if maintenance_info else ft.Container()
 
@@ -149,15 +148,23 @@ def profile_set(page: ft.Page) -> ft.Container:
                         ]
                     ),
                     ft.Divider(),
-                    maintenance_column,
-                    ft.Button(
-                        text= 'Cerrar sesión',
-                        height= 50,
-                        width= 150,
-                        on_click= try_to_logout,
-                        icon= ft.Icons.LOGOUT,
-                        color= ft.Colors.WHITE,
-                        bgcolor= ft.Colors.RED_400
+                    ft.Stack(
+                        alignment= ft.alignment.bottom_right,
+                        controls= [
+                            maintenance_column,
+                            ft.Container(
+                                margin= 10,
+                                content= ft.Button(
+                                    text= 'Cerrar sesión',
+                                    height= 50,
+                                    width= 150,
+                                    on_click= try_to_logout,
+                                    icon= ft.Icons.LOGOUT,
+                                    color= ft.Colors.WHITE,
+                                    bgcolor= ft.Colors.RED_400
+                                ),
+                            ),
+                        ]
                     ),
                     grey_band,
                 ]
