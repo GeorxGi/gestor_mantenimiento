@@ -38,7 +38,7 @@ def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
     if not name or not amount:
         return CreateSpareCases.EMPTY_INPUT
     #Valida que no se intenten almacenar cero piezas en la DB
-    if amount < 0:
+    if amount <= 0:
         return CreateSpareCases.INVALID_AMOUNT
 
     #Crea la pieza en la DB y obtiene el código que se le fue asignado (autoincremental)

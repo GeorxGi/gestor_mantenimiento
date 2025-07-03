@@ -17,6 +17,12 @@ def get_user_by_id(user_id:str) -> Technician | Supervisor | Admin | None:
         data = db.fetch_user_by_id(user_id)
         return _create_user_from_dict(data)
 
+def get_all_available_technicians() -> list[Technician]:
+    with UserSQL() as db:
+        data = db.fetch_available_technicians()
+        print(data)
+        return [Technician.from_dict(tech) for tech in data]
+
 def check_access_level(user:User):
     return user.get_access_level()
 

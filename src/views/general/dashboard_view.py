@@ -6,7 +6,7 @@ from src.utils.notification_handler import listen_to
 
 from src.views.supervisor.create_equipment_view import create_equipment_view
 from src.views.supervisor.create_maintenance_view import create_maintenance_view
-from src.views.supervisor.create_spare_view import create_piece_view
+from src.views.supervisor.create_spare_view import create_spare_view
 
 from src.widgets.global_app_bar import global_app_bar
 from src.widgets.global_navigation_bar import global_navigation_bar
@@ -38,7 +38,7 @@ class DashboardView:
         # Obtener el nivel de acceso del usuario logueado
         user_data = self.page.session.get("local_user")
 
-        self.access_level:AccessLevel = AccessLevel.from_string(user_data.get("access_level")) if user_data else AccessLevel.SUPERVISOR
+        self.access_level:AccessLevel = AccessLevel.from_string(user_data.get("access_level")) if user_data else AccessLevel.USER
         
         # Mostrar mensaje de bienvenida si viene del login
         if user_data and not self.page.session.get("welcome_shown"):
@@ -75,7 +75,7 @@ class DashboardView:
                             size=25),
                         ButtonsAdd(text= "Equipo", on_click_event= lambda _: navigate_to(create_equipment_view)),
                         ButtonsAdd(text= "Orden de mantenimiento", on_click_event= lambda _: navigate_to(create_maintenance_view)),
-                        ButtonsAdd(text= "Solicitud de pieza", on_click_event= lambda _: navigate_to(create_piece_view)),
+                        ButtonsAdd(text= "Solicitud de pieza", on_click_event= lambda _: navigate_to(create_spare_view)),
                     ], 
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                     spacing=10

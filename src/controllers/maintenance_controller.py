@@ -106,18 +106,12 @@ def get_maintenance_basic_info(maintenance_id:str) -> dict | None:
     with MaintenanceSQL() as db:
         return db.fetch_maintenance_basic_info(maintenance_id)
 
+def get_all_technician_maintenances(technician_id:str):
+    if not technician_id:
+        return None
+
+    with MaintenanceSQL() as db:
+        return db.fetchall_technician_maintenances(technician_id)
+
 if __name__ == '__main__':
-    print (create_maintenance_order(
-        supervisor_id= "8a9169c5-e722-4c29-97bf-e8fd9c9b270f",
-        maintenance_date= date.today(),
-        details= "Mantenimiento de prueba",
-        asigned_technicians_id= ["285ee627-4d20-4312-869f-adf60bf918d6", "bde87a67-afe8-42e7-8656-2b79779cee0b"],
-        equipment_code= "23GH12"
-    ).value)
-
-    print( conclude_maintenance(
-        maintenance_id= ""
-    ))
-
-    #for item in get_supervisor_pending_maintenances("f70b82d0-5a56-498b-ab3f-6d6fc488b99c"):
-    #    print (item.to_dict())
+    print (get_all_technician_maintenances("f912486a-ff6e-4dca-bc66-101e87203a48"))

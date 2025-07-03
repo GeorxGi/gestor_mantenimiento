@@ -19,7 +19,7 @@ def profile_set(page: ft.Page) -> ft.Container:
         return ft.Container(
             alignment= ft.alignment.center_left,
             expand= True,
-            margin= 10,
+            margin= 5,
             content= ft.Column(
                 horizontal_alignment= ft.CrossAxisAlignment.START,
                 spacing=2,
@@ -62,13 +62,12 @@ def profile_set(page: ft.Page) -> ft.Container:
             content=ft.Text(access_level.name, size=20, weight=ft.FontWeight.W_700, color=color_by_access)
         )
 
-    grey_band = ft.Container(height=40, bgcolor= ft.Colors.BLUE_GREY_700, expand= True)
+    grey_band = ft.Container(height=40, bgcolor= ft.Colors.BLUE_GREY_700)
 
     maintenance_column = ft.Column(
         horizontal_alignment= ft.alignment.center,
         controls= [
             ft.Container(
-                expand= True,
                 alignment= ft.alignment.center,
                 content= ft.Text(
                     value= "Mantenimiento pendiente",
