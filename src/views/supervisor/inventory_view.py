@@ -5,17 +5,21 @@ from src.widgets.spare_details_dialog import spare_details_window
 from src.widgets.equipment_details_dialog import equipment_details_dialog
 from src.widgets.filter_dialog import filter_dialog
 from src.controllers.equipment_controller import get_all_equipments
+from src.controllers.maintenance_controller import get_all_maintenance_orders
 
 def inventory(page: ft.Page):
     
     show_pieces = ft.Ref[bool]()
     show_equipment = ft.Ref[bool]()
+    show_maintenance = ft.Ref[bool]()
     show_pieces.current = True
     show_equipment.current = False
+    show_maintenance.current = False
     
-    def update_filters(pieces, equipment):
+    def update_filters(pieces, equipment, maintenance):
         show_pieces.current = pieces
         show_equipment.current = equipment
+        show_maintenance.current = maintenance
         update_cards()
     
     def open_filter_dialog(e):
@@ -60,6 +64,19 @@ def inventory(page: ft.Page):
             "model": eq.provider  # Usando provider como modelo temporalmente
         }
         for eq in equipment_objects
+    ]
+    
+    # Obtener órdenes de mantenimiento de la base de datos
+    maintenance_objects = get_all_maintenance_orders()
+    maintenance_data = [
+        {
+            "id": maint.id,
+            "equipment_code": maint.equipment_code,
+            "details": maint.details,
+            "date": str(maint.maintenance_date),
+            "status": "Pendiente" if maint.is_pending else "Completado"
+        }
+        for maint in maintenance_objects
     ]
     
     def create_content():
