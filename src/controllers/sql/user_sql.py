@@ -88,14 +88,6 @@ class UserSQL(BaseSqlController):
             params= (maintenance_id, *tech_id, AccessLevel.TECHNICIAN.name)
         )
 
-    def fetch_all_workers(self) -> list[dict]:
-        """Obtiene todos los trabajadores (técnicos, supervisores y admins)"""
-        return [
-            dict(row) for row in self._fetchall(
-                query=f"SELECT {self.public_fields} FROM {self.table()} ORDER BY access_level DESC, fullname ASC"
-            )
-        ]
-
 if __name__ == '__main__':
     with UserSQL() as db:
         response = db.fetch_available_technicians()

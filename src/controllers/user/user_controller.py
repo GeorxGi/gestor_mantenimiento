@@ -23,12 +23,6 @@ def get_all_available_technicians() -> list[Technician]:
         print(data)
         return [Technician.from_dict(tech) for tech in data]
 
-def get_all_workers() -> list[Technician | Supervisor | Admin]:
-    """Obtiene todos los trabajadores (técnicos, supervisores y admins) para el administrador"""
-    with UserSQL() as db:
-        data = db.fetch_all_workers()
-        return [_create_user_from_dict(worker) for worker in data if _create_user_from_dict(worker)]
-
 def check_access_level(user:User):
     return user.get_access_level()
 

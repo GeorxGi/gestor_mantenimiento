@@ -17,30 +17,12 @@ class Maintenance:
 
     @staticmethod
     def get_date_by_string(datestr:str) -> date | None:
-        if not datestr or datestr == "None":
-            return None
-            
-        # Lista de formatos de fecha a probar
-        date_formats = [
-            "%Y-%m-%d",      # 2024-12-15
-            "%d-%m-%Y",      # 15-12-2024
-            "%d/%m/%Y",      # 15/12/2024
-            "%Y/%m/%d",      # 2024/12/15
-            "%Y-%m-%d %H:%M:%S",  # 2024-12-15 10:30:00
-            "%d-%m-%Y %H:%M:%S"   # 15-12-2024 10:30:00
-        ]
-        
-        for fmt in date_formats:
-            try:
-                return datetime.strptime(str(datestr), fmt).date()
-            except ValueError:
-                continue
-                
-        # Si ningún formato funciona, intentar parsing automático
         try:
-            from dateutil import parser
-            return parser.parse(str(datestr)).date()
-        except:
+            date_obj = datetime.strptime(datestr, "%d-%m-%Y").date()
+            if not date_obj:
+                date_obj = datetime.strptime(datestr, "%Y-%m-%d").date()
+            return date_obj
+        except Exception:
             return None
 
     @classmethod

@@ -26,28 +26,6 @@ class SpareSQL(BaseSqlController):
         )
         return [dict(value) for value in data]
 
-    def update_spare(self, code: int, name: str, amount: int) -> bool:
-        try:
-            self.connection.execute(
-                f"UPDATE {self.table()} SET name = ?, amount = ? WHERE code = ?",
-                (name, amount, code)
-            )
-            self.connection.commit()
-            return True
-        except:
-            return False
-
-    def delete_spare(self, code: int) -> bool:
-        try:
-            self.connection.execute(
-                f"DELETE FROM {self.table()} WHERE code = ?",
-                (code,)
-            )
-            self.connection.commit()
-            return True
-        except:
-            return False
-
 if __name__ == '__main__':
     with SpareSQL() as db:
         print(db.fetch_all_spares())

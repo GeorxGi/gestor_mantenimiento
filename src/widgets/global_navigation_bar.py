@@ -5,16 +5,11 @@ from src.enums.access_level import AccessLevel
 
 
 def global_navigation_bar(page: ft.Page, access_level: AccessLevel, on_change_callback) -> ft.NavigationBar:
-    # Cambiar label según el tipo de usuario
-    first_label = "Órdenes" if access_level == AccessLevel.TECHNICIAN else "Inventario"
-    first_icon = ft.Icons.ASSIGNMENT if access_level == AccessLevel.TECHNICIAN else ft.Icons.HOME_OUTLINED
-    first_selected_icon = ft.Icons.ASSIGNMENT_TURNED_IN if access_level == AccessLevel.TECHNICIAN else ft.Icons.HOME
-    
     destinations = [
         ft.NavigationBarDestination(
-            icon=first_icon,
-            label=first_label,
-            selected_icon=first_selected_icon
+            icon=ft.Icons.HOME_OUTLINED,
+            label="Inventario",
+            selected_icon=ft.Icons.HOME
         ),
         ft.NavigationBarDestination(
             icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
@@ -43,14 +38,6 @@ def global_navigation_bar(page: ft.Page, access_level: AccessLevel, on_change_ca
                 alignment=ft.alignment.center
             ),
             label="Agregar"
-        ))
-    
-    # Solo administradores pueden ver trabajadores
-    if access_level == AccessLevel.ADMIN:
-        destinations.insert(1, ft.NavigationBarDestination(
-            icon=ft.Icons.PEOPLE_OUTLINE,
-            label="Trabajadores",
-            selected_icon=ft.Icons.PEOPLE
         ))
     
     return ft.NavigationBar(
