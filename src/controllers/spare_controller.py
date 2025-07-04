@@ -10,7 +10,7 @@ from src.enums.create_spare_cases import CreateSpareCases
 
 from PIL import Image
 
-def __process_and_store_image(image_bytes, output_path:str):
+def process_and_store_image(image_bytes, output_path:str):
     #Valída que los bytes ingresados representen una imagen
     try:
         with Image.open(io.BytesIO(image_bytes)) as img:
@@ -56,7 +56,7 @@ def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
     if image_bytes:
         os.makedirs(SPARE_IMAGES_PATH, exist_ok= True)
         image_path = f"{SPARE_IMAGES_PATH}/{spare_code}.jpg"
-        __process_and_store_image(image_bytes, image_path)
+        process_and_store_image(image_bytes, image_path)
 
     return CreateSpareCases.CORRECT
 
@@ -69,6 +69,22 @@ def get_spare_by_partial_name(partial_str:str) -> list[Spare]:
     with SpareSQL() as db:
         data = db.fetch_by_partial_name(partial_str)
         return [Spare.from_dict(spr) for spr in data]
+
+def update_spare(code: int, name: str, amount: int) -> bool:
+    """Actualiza una pieza de repuesto"""
+    with SpareSQL() as db:
+        return db.update_spare(code, name, amount)
+
+def delete_spare(code: int) -> bool:
+    """Elimina una pieza de repuesto"""
+    with SpareSQL() as db:
+        success = db.delete_spare(code)
+        if success:
+            # Eliminar imagen si existe
+            image_path = f"{SPARE_IMAGES_PATH}/{code}.jpg"
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        return success
 
 if __name__ == '__main__':
     get_spare_by_partial_name("")
