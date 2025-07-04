@@ -106,7 +106,7 @@ class DashboardView:
         self.page.close(self.add_options)
         self.navigation_bar.selected_index = self.last_selected_index
         
-        profile_index = 2 if self.access_level == "SUPERVISOR" else 1
+        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else 1
         
         self.content_area.controls.clear()
         if self.last_selected_index == 0:
