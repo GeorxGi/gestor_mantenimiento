@@ -128,6 +128,11 @@ def get_technicians_in_maintenance(maintenance_id:str) -> list[Technician]:
         rows = db.fetchall_technicians_in_maintenance(maintenance_id)
         return [Technician.from_dict(tech) for tech in rows]
 
+def get_all_maintenances() -> list[Maintenance]:
+    with MaintenanceSQL() as db:
+        rows = db.fetchall_maintenances()
+        return [Maintenance.from_dict(maint) for maint in rows]
+
 if __name__ == '__main__':
     print(get_equipment_maintenance_info("TUPAPA"))
     print (get_all_technician_maintenances("f912486a-ff6e-4dca-bc66-101e87203a48"))

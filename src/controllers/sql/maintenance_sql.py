@@ -132,6 +132,10 @@ class MaintenanceSQL(BaseSqlController):
         )
         return [dict(data) for data in rows]
 
+    def fetchall_maintenances(self) -> list[dict]:
+        rows = self._fetchall(query= f'SELECT * FROM {self.table()}', params= ())
+        return [dict(row) for row in rows]
+
 if __name__ == '__main__':
     with MaintenanceSQL() as db:
         print(db.fetchall_technicians_id_in_maintenance("5289faea-f996-46e6-9de5-034792128d4e"))
