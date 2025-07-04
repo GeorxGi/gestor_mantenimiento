@@ -28,10 +28,7 @@ class Maintenance:
     @classmethod
     def from_dict(cls, data:dict):
         date_str = data.get("maintenance_date", "")
-        if date_str:
-            fecha_obj = datetime.strptime(date_str, "%d-%m-%Y").date()
-        else:
-            return None
+        fecha_obj = Maintenance.get_date_by_string(date_str)
 
         return cls(
             maintenance_id= data.get("id", ""),
