@@ -6,6 +6,6 @@ def logout(page: ft.Page):
     listening_sessions.pop(page.session_id) if page.session_id is not None else None
     for value in listening_sessions:
         print(value)
-    page.go('/')
     page.clean()
+    page.go('/')
     page.update()
