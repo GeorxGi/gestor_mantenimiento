@@ -82,23 +82,23 @@ def create_spare_view(page:ft.Page, on_success=None):
     )
 
     title_form = ft.Column(
-        controls = [
+        controls=[
             ft.Icon(
                 ft.Icons.EXTENSION,
-                size= 80,
-                color= middle_color
+                size=80,
+                color=middle_color
             ),
             ft.Text(
                 value="Agregar pieza",
-                size= 25,
-                weight= ft.FontWeight.BOLD,
-                color= ft.Colors.GREY_700
+                size=25,
+                weight=ft.FontWeight.BOLD,
+                color=ft.Colors.GREY_700
             ),
-            ft.Divider(height= 15, color= ft.Colors.GREY_300),
+            ft.Divider(height=15, color=ft.Colors.GREY_300),
         ],
-        alignment= ft.MainAxisAlignment.CENTER,
-        horizontal_alignment= ft.CrossAxisAlignment.CENTER,
-        spacing= 10
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        spacing=10
     )
 
     image_preview = ft.Container(

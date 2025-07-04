@@ -17,6 +17,9 @@ def spare_details_window(*, page: ft.Page, code:int, name:str, quantity:int, ima
     
     def replace():
         print('funcion para reposicion de pieza')
+    
+    def edit_image():
+        print('funcion para editar imagen')
         
     buttons_list = [
         dialog_button(
@@ -66,19 +69,68 @@ def spare_details_window(*, page: ft.Page, code:int, name:str, quantity:int, ima
             on_click=lambda _: replace()
         ))
         
-    container_img = ft.Container(
-        width=100,
-        height=100,
-        bgcolor=ft.Colors.GREY_200,
-        border_radius=15,
+    # Botón de cámara flotante
+    camera_button = ft.Container(
+        width=40,
+        height=40,
+        bgcolor=middle_color,
+        border_radius=20,
         alignment=ft.alignment.center,
-        content=ft.Image(
-            src=image_src,
-            fit=ft.ImageFit.COVER,
-            border_radius=ft.border_radius.all(13)) if image_src else ft.Icon(
-            ft.Icons.IMAGE,
-            size=50,
-            color=ft.Colors.GREY_300
+        content=ft.Icon(
+            ft.Icons.CAMERA_ALT,
+            color=ft.Colors.WHITE,
+            size=20
+        ),
+        on_click=lambda _: edit_image(),
+        shadow=ft.BoxShadow(
+            spread_radius=1,
+            blur_radius=5,
+            color=ft.Colors.BLACK26
+        )
+    )
+    
+    container_img = ft.Container(
+        width=200,
+        height=200,
+        bgcolor=ft.Colors.GREY_200,
+        border_radius=20,
+        content=ft.Stack(
+            controls=[
+                # Imagen principal
+                ft.Container(
+                    width=200,
+                    height=200,
+                    alignment=ft.alignment.center,
+                    content=ft.Image(
+                        src=image_src,
+                        fit=ft.ImageFit.COVER,
+                        border_radius=ft.border_radius.all(13)
+                    ) if image_src else ft.Icon(
+                        ft.Icons.IMAGE,
+                        size=50,
+                        color=ft.Colors.GREY_300
+                    )
+                ),
+                # boton de camara para editar
+                ft.Container(
+                    width=200,
+                    height=200,
+                    padding=ft.padding.all(10),
+                    content=ft.Column(
+                        controls=[
+                            ft.Container(expand=True), 
+                            ft.Row(
+                                controls=[
+                                    ft.Container(expand=True),  
+                                    camera_button
+                                ],
+                                spacing=0
+                            )
+                        ],
+                        spacing=0
+                    )
+                )
+            ]
         )
     )
     
@@ -91,16 +143,34 @@ def spare_details_window(*, page: ft.Page, code:int, name:str, quantity:int, ima
         on_click=lambda _: page.close(dialog)
     )
     
+    info_card = ft.Container(
+        bgcolor=middle_color,
+        content=ft.Column(
+            controls=[
+                ft.Text(value=f"Código: #{code}", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                ft.Text(value=f"Nombre: {name}", size=14, color=ft.Colors.WHITE),
+                ft.Text(value=f"Cantidad: {quantity}", size=14, color=ft.Colors.WHITE),
+            ],
+            spacing=5
+        ),
+        padding=10,
+        border_radius=20,
+        shadow=ft.BoxShadow(
+            spread_radius=1,
+            blur_radius=5,
+            color=ft.Colors.BLACK26
+        ),
+        width=300
+    )
+    
     dialog = ft.AlertDialog(
-        title=ft.Text(value= "Detalles de la pieza", size=18, weight=ft.FontWeight.BOLD),
+        title=ft.Text(value="Detalles de la pieza", size=18, weight=ft.FontWeight.BOLD),
         content=ft.Column(
             width=400,
-            controls= [
+            controls=[
                 container_img,
                 ft.Divider(height=20),
-                ft.Text(value= f"Código: #{code}", size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_700),
-                ft.Text(value= f"Nombre: {name}", size=14),
-                ft.Text(value= f"Cantidad: {quantity}", size=14),
+                info_card,
                 ft.Divider(height=10),
                 # Fila de botones de acción
                 ft.Row(
