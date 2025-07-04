@@ -15,6 +15,7 @@ from src.controllers.equipment_controller import equipment_exists
 from src.controllers.sql.maintenance_sql import MaintenanceSQL
 
 from src.models.maintenance import Maintenance
+from src.models.users.technician import Technician
 
 def create_maintenance_order(*, equipment_code:str, supervisor_id:str, asigned_technicians_id:list[str], details:str, maintenance_date:date) -> CreateMaintenanceCases:
     #Verifica que los datos de entrada no estén vacios
@@ -80,7 +81,7 @@ def conclude_maintenance(maintenance_id:str) -> bool:
     if not maintenance_id:
         return False
     with MaintenanceSQL() as db:
-        technicians:list[str] = db.fetchall_technicians_in_maintenance(maintenance_id)
+        technicians:list[str] = db.fetchall_technicians_id_in_maintenance(maintenance_id)
         db.set_maintenance_no_longer_pending(maintenance_id)
 
     with UserSQL() as db:
@@ -111,16 +112,21 @@ def get_all_technician_maintenances(technician_id:str):
         return None
 
     with MaintenanceSQL() as db:
-        return db.fetchall_technician_maintenances(technician_id)
+        return db.fetchall_technician_maintenance_history(technician_id)
 
 def get_equipment_maintenance_info(equipment_code:str) -> list[dict]:
     if not equipment_code:
         return []
     with MaintenanceSQL() as db:
         maint = db.fetchall_equipment_maintenances(equipment_code)
+        return [Maintenance.from_dict(mant) for mant in maint]
+
+def get_technicians_in_maintenance(maintenance_id:str) -> list[Technician]:
+    if not maintenance_id:
         return []
-        #TERMINAR AQUI
-        #return [Maintenance.from_dict(data) for data in maint]
+    with MaintenanceSQL() as db:
+        rows = db.fetchall_technicians_in_maintenance(maintenance_id)
+        return [Technician.from_dict(tech) for tech in rows]
 
 if __name__ == '__main__':
     print(get_equipment_maintenance_info("TUPAPA"))

@@ -45,20 +45,28 @@ class MaintenanceSQL(BaseSqlController):
             params= (supervisor_id, )
         )
 
-    def fetchall_technicians_in_maintenance(self, maintenance_id:str) -> list[str]:
+    def fetchall_technicians_id_in_maintenance(self, maintenance_id:str) -> list[str]:
         """Obtiene el id de todos los técnicos asignados a un mantenimiento"""
-        if not maintenance_id:
-            return []
         value = self._fetchall(
             query= f"SELECT technician_id FROM {self.second_table()} WHERE maintenance_id = ?",
             params= (maintenance_id, )
         )
         return [row for row in value]
 
+    def fetchall_technicians_in_maintenance(self, maintenance_id:str) -> list[dict]:
+        query= f"""
+            SELECT {UserSQL.public_fields}
+            FROM {self.second_table()} mt
+            INNER JOIN {UserSQL().table()} u ON u.id = mt.technician_id
+            WHERE mt.maintenance_id = ?
+        """
+        rows = self._fetchall(query= query, params= (maintenance_id, ))
+        return [dict(row) for row in rows]
+
     def fetch_maintenance_basic_info(self, maintenance_id:str) -> dict:
         """Devuelve datos básicos sobre un mantenimiento como detalles, fecha y nombre del equipo)"""
         query = f"""
-            SELECT m.details, m.maintenance_date, e.name
+            SELECT m.details, m.maintenance_date, e.name 
             FROM {self.table()} m
             JOIN {EquipmentSQL().table()} e ON m.equipment_code = e.code
             WHERE m.id = ?
@@ -89,7 +97,7 @@ class MaintenanceSQL(BaseSqlController):
             params= (maintenance_id, )
         )
 
-    def fetchall_technician_maintenances(self, technician_id:str) -> list[dict]:
+    def fetchall_technician_maintenance_history(self, technician_id:str) -> list[dict]:
         """Obtiene una lista con el historial de todos los mantenimientos de un técnico con datos como
         nombre del supervisor que lo asigno, detalles, fecha de mantenimiento y estado (pendiente o completado)"""
         query= f"""
@@ -126,4 +134,4 @@ class MaintenanceSQL(BaseSqlController):
 
 if __name__ == '__main__':
     with MaintenanceSQL() as db:
-        print(db.fetchall_technicians_in_maintenance("5289faea-f996-46e6-9de5-034792128d4e"))
+        print(db.fetchall_technicians_id_in_maintenance("5289faea-f996-46e6-9de5-034792128d4e"))
