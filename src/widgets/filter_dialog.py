@@ -11,7 +11,8 @@ def filter_dialog(page: ft.Page, on_filter_change):
     def apply_filter(e):
         pieces = selected_filter.current == "pieces"
         equipment = selected_filter.current == "equipment"
-        on_filter_change(pieces, equipment)
+        maintenance = selected_filter.current == "maintenance"
+        on_filter_change(pieces, equipment, maintenance)
         page.close(dialog)
     
     dialog = ft.AlertDialog(
@@ -20,7 +21,8 @@ def filter_dialog(page: ft.Page, on_filter_change):
             ft.RadioGroup(
                 content=ft.Column([
                     ft.Radio(value="pieces", label="Piezas"),
-                    ft.Radio(value="equipment", label="Equipos")
+                    ft.Radio(value="equipment", label="Equipos"),
+                    ft.Radio(value="maintenance", label="Órdenes de mantenimiento")
                 ]),
                 value="pieces",
                 on_change=on_radio_change
