@@ -12,8 +12,8 @@ def hash_password(to_encript:str) -> str:
 
     return hashed.decode(_ENCODE_TYPE)
 
-def compare_hashed(first:str, second:str):
+def compare_hashed(password_plaintext:str, hashed:str):
     return bcrypt.checkpw(
-        second.encode(_ENCODE_TYPE),
-        first.encode(_ENCODE_TYPE)
+        password_plaintext.encode(_ENCODE_TYPE),
+        hashed.encode(_ENCODE_TYPE)
     )

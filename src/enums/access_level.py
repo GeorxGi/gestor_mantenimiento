@@ -1,6 +1,6 @@
 from enum import Enum
 
-class AccessLevel(Enum):
+class AccessLevel(int, Enum):
     USER = 0
     TECHNICIAN = 1
     SUPERVISOR = 2

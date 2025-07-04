@@ -1,7 +1,8 @@
 import flet as ft
 
-def CustomTextField(*, hint_label:str, width:int, is_pass:bool = False, icon:ft.Icons) -> ft.TextField:
+def CustomTextField(*, hint_label:str, width:int, is_pass:bool = False, icon:ft.Icons, on_submit = None) -> ft.TextField:
     return ft.TextField(
+        on_submit= on_submit,
         label= hint_label,
         border_color= ft.Colors.BLUE,
         width= width,

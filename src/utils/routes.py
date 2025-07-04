@@ -10,8 +10,6 @@ _views_registry = {}
 def register_view(route: str):
     """Decorador para registrar vistas"""
     def decorator(view_class):
-        if route in _views_registry:
-            raise ValueError(f"La ruta '{route}' ya está registrada")
         _views_registry[route] = view_class
         return view_class
     return decorator

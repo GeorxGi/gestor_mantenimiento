@@ -1,6 +1,7 @@
 import flet as ft
 def gradient_button(*, text:str, width:int = 350, height:int = 48, gradient:list[ft.Colors], text_color:ft.Colors = ft.Colors.WHITE, on_click) -> ft.Container:
     return ft.Container(
+        expand= False,
         width= width,
         height= height,
         gradient= ft.LinearGradient(
