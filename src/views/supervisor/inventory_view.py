@@ -1,11 +1,14 @@
 import flet as ft 
-from src.consts.colors import middle_color
+from src.consts.colors import *
 from src.widgets.spare_card import spare_card
 from src.widgets.spare_details_dialog import spare_details_window
 from src.widgets.equipment_details_dialog import equipment_details_dialog
 from src.widgets.filter_dialog import filter_dialog
 from src.controllers.equipment_controller import get_all_equipments
-from src.controllers.maintenance_controller import get_all_maintenance_orders
+from src.controllers.maintenance_controller import get_all_maintenance_orders, get_supervisor_pending_maintenances, conclude_maintenance
+from src.controllers.spare_controller import get_all_spares
+from src.consts.file_dir import SPARE_IMAGES_PATH
+import os
 
 def inventory(page: ft.Page):
     
@@ -44,14 +47,8 @@ def inventory(page: ft.Page):
         spacing= 10
     )
     
-    # Datos de ejemplo
-    spare_data = [
-        {"code": "1234", "name": "Tornillo M8", "quantity": 25},
-        {"code": "5678", "name": "Tuerca M8", "quantity": 15},
-        {"code": "9012", "name": "Arandela", "quantity": 50},
-        {"code": "3456", "name": "Perno L10", "quantity": 8},
-        {"code": "7890", "name": "Rodamiento", "quantity": 12},
-    ]
+    # Obtener piezas de la base de datos
+    spare_data = get_all_spares()
     
     # Obtener equipos de la base de datos
     equipment_objects = get_all_equipments()
@@ -59,9 +56,8 @@ def inventory(page: ft.Page):
         {
             "code": eq.code,
             "name": eq.name,
-            "status": "Activo",  # Por defecto, ajustar según tu modelo
-            "location": "No especificada",  # Agregar si tienes este campo
-            "model": eq.provider  # Usando provider como modelo temporalmente
+            "description": eq.description,
+            "provider": eq.provider  # Usando provider como modelo temporalmente
         }
         for eq in equipment_objects
     ]
@@ -79,14 +75,33 @@ def inventory(page: ft.Page):
         for maint in maintenance_objects
     ]
     
+    # Obtener mantenimientos pendientes del supervisor
+    user_data = page.session.get("local_user")
+    supervisor_id = user_data.get("id", "") if user_data else ""
+    pending_maintenance_objects = get_supervisor_pending_maintenances(supervisor_id)
+    pending_maintenance_data = [
+        {
+            "id": maint.id,
+            "equipment_code": maint.equipment_code,
+            "details": maint.details,
+            "date": str(maint.maintenance_date)
+        }
+        for maint in pending_maintenance_objects
+    ]
+    
     def create_content():
         if show_pieces.current:
             # Crear filas de 2 cards para piezas
             cards = []
             for item in spare_data:
+                # Verificar si existe imagen para esta pieza
+                image_path = os.path.join(SPARE_IMAGES_PATH, f"{item['code']}.jpg")
+                image_src = str(image_path) if os.path.exists(image_path) else None
+                
                 card = spare_card(
                     code=item["code"],
                     name=item["name"],
+                    image_src=image_src,
                     on_click=lambda e, c=item["code"], n=item["name"], q=item["quantity"]: spare_details_window(page, c, n, q)
                 )
                 cards.append(card)
@@ -113,11 +128,13 @@ def inventory(page: ft.Page):
             if equipment_data:
                 for item in equipment_data:
                     equipment_item = ft.ListTile(
-                        leading=ft.Icon(ft.Icons.PRECISION_MANUFACTURING, color=ft.Colors.GREEN_600),
-                        title=ft.Text(f"#{item['code']}", weight=ft.FontWeight.BOLD),
-                        subtitle=ft.Text(item["name"]),
+                        style= ft.border_radius.all(20),
+                        leading=ft.Icon(ft.Icons.PRECISION_MANUFACTURING, color=purple_color),
+                        title=ft.Text(item["name"], weight=ft.FontWeight.BOLD, color=dark_grey_color),
+                        subtitle=ft.Text(f"#{item['code']}", color=grey_color),
+                        # quiero poner un trailing de editar y eliminar
                         on_click=lambda e, item=item: equipment_details_dialog(
-                            page, item["code"], item["name"], item["status"], item["location"], item["model"]
+                            page, item["code"], item["name"], item["description"], item["provider"]
                         )
                     )
                     equipment_list.append(equipment_item)
@@ -127,6 +144,32 @@ def inventory(page: ft.Page):
                 )
             
             return [ft.Column(controls=equipment_list, spacing=5)]
+        
+        elif show_maintenance.current:
+            # Crear lista para órdenes de mantenimiento
+            maintenance_list = []
+            if maintenance_data:
+                for item in maintenance_data:
+                    status_color = ft.Colors.ORANGE if item["status"] == "Pendiente" else ft.Colors.GREEN
+                    maintenance_item = ft.ListTile(
+                        leading=ft.Icon(ft.Icons.BUILD, color=status_color),
+                        title=ft.Text(f"Equipo: {item['equipment_code']}", weight=ft.FontWeight.BOLD),
+                        subtitle=ft.Text(f"{item['details']} - {item['date']}"),
+                        trailing=ft.Chip(
+                            label=ft.Text(item["status"]),
+                            bgcolor=status_color,
+                            label_style=ft.TextStyle(color=ft.Colors.WHITE)
+                        )
+                    )
+                    maintenance_list.append(maintenance_item)
+            else:
+                maintenance_list.append(
+                    ft.Text("No hay órdenes de mantenimiento registradas", color=ft.Colors.GREY_500, size=16)
+                )
+            
+            return [ft.Column(controls=maintenance_list, spacing=5)]
+        
+
         
         return []
     
