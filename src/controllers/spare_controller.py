@@ -67,7 +67,7 @@ def get_all_spares() -> list[dict]:
 
 def get_spare_by_partial_name(partial_str:str) -> list[Spare]:
     with SpareSQL() as db:
-        data = db.fetch_by_partial_name(partial_str)
+        data = db.fetch_all_spares() if not partial_str else db.fetch_by_partial_name(partial_str)
         return [Spare.from_dict(spr) for spr in data]
 
 def update_spare(code: int, name: str, amount: int) -> bool:

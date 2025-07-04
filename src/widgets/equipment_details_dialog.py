@@ -67,22 +67,6 @@ def equipment_details_dialog(page: ft.Page, equipment: Equipment):
             on_click=lambda _: page.close(dialog)
         )
     ], spacing=10, alignment=ft.MainAxisAlignment.CENTER)
-    
-    dialog = ft.AlertDialog(
-        title=ft.Row([
-            ft.Icon(ft.Icons.PRECISION_MANUFACTURING, color=purple_color),
-            ft.Text("Detalles del Equipo", size=20, weight=ft.FontWeight.BOLD)
-        ], spacing=10),
-        content=ft.Column([
-            equipment_icon,
-            ft.Divider(height=20),
-            info_card,
-            ft.Divider(height=10),
-            action_buttons
-        ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=15),
-        content_padding=30
-    )
-    page.open(dialog)
 
 def edit_equipment(page: ft.Page, current_dialog, equipment: Equipment):
     name_field = ft.Container(

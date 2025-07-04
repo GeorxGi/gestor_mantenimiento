@@ -17,7 +17,7 @@ def main(page: ft.Page):
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.on_disconnect = lambda _: listening_sessions.pop(page.session_id, None)
     page.scroll = ft.ScrollMode.AUTO
-    print("new_session:", page.session_id)
+    print("new_session: ", page.session_id)
 
     def route_change(_):
         #Evita que se intente duplicar una página
@@ -47,4 +47,5 @@ ft.app(
     target= main,
     view= ft.AppView.FLET_APP,
     assets_dir="assets",
+    upload_dir='assets/uploads'
 )

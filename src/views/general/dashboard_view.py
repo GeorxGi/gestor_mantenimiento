@@ -21,9 +21,11 @@ from src.consts.colors import middle_color
 class ButtonsAdd(ft.ElevatedButton):
     def __init__(self, text, on_click_event):
         super().__init__()
-        self.content = ft.Text(text, 
-                               color=ft.Colors.WHITE,
-                               size=15)
+        self.content = ft.Text(
+            text,
+            color=ft.Colors.WHITE,
+            size=15
+        )
         self.on_click = on_click_event
         self.bgcolor = middle_color
         self.color = ft.Colors.WHITE
