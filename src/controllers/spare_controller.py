@@ -57,6 +57,11 @@ def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
 
     return CreateSpareCases.CORRECT
 
+def get_all_spares() -> list[dict]:
+    """Obtiene todas las piezas de repuesto de la base de datos"""
+    with SpareSQL() as db:
+        return db.get_all_spares()
+
 if __name__ == '__main__':
     test_image_path = "D:/Grabaciones/Marvel Rivals/Marvel Rivals_2024.12.06-01.20.png"
 

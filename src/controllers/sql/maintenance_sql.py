@@ -40,10 +40,23 @@ class MaintenanceSQL(BaseSqlController):
 
     def fetchall_supervisor_pending_maintenances(self, supervisor_id:str):
         """Obtiene todos los mantenimientos pendientes de un supervisor"""
-        return self._fetchall(
+        rows = self._fetchall(
             query= f"SELECT * FROM {self.table()} WHERE supervisor_id = ? AND is_pending = TRUE",
             params= (supervisor_id, )
         )
+        maintenances = []
+        for row in rows:
+            maintenance = Maintenance(
+                maintenance_id=row[0],
+                supervisor_id=row[1],
+                equipment_code=row[2],
+                maintenance_date=Maintenance.get_date_by_string(row[3]),
+                is_pending=bool(row[4]),
+                details=row[5],
+                asigned_technicians_id=[]
+            )
+            maintenances.append(maintenance)
+        return maintenances
 
     def fetchall_technicians_in_maintenance(self, maintenance_id:str) -> list[str]:
         """Obtiene el id de todos los técnicos asignados a un mantenimiento"""
@@ -114,6 +127,26 @@ class MaintenanceSQL(BaseSqlController):
             }
             for row in rows
         ]
+
+    def fetchall_maintenance_orders(self) -> list[Maintenance]:
+        """Obtiene todas las órdenes de mantenimiento"""
+        rows = self._fetchall(
+            query= f"SELECT * FROM {self.table()}",
+            params= ()
+        )
+        maintenances = []
+        for row in rows:
+            maintenance = Maintenance(
+                maintenance_id=row[0],
+                supervisor_id=row[1],
+                equipment_code=row[2],
+                maintenance_date=Maintenance.get_date_by_string(row[3]),
+                is_pending=bool(row[4]),
+                details=row[5],
+                asigned_technicians_id=[]
+            )
+            maintenances.append(maintenance)
+        return maintenances
 
 if __name__ == '__main__':
     with MaintenanceSQL() as db:

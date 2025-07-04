@@ -113,5 +113,10 @@ def get_all_technician_maintenances(technician_id:str):
     with MaintenanceSQL() as db:
         return db.fetchall_technician_maintenances(technician_id)
 
+def get_all_maintenance_orders() -> list[Maintenance]:
+    """Obtiene todas las órdenes de mantenimiento"""
+    with MaintenanceSQL() as db:
+        return db.fetchall_maintenance_orders()
+
 if __name__ == '__main__':
     print (get_all_technician_maintenances("f912486a-ff6e-4dca-bc66-101e87203a48"))
