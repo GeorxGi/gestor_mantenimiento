@@ -10,17 +10,12 @@ def global_navigation_bar(page: ft.Page, access_level: AccessLevel, on_change_ca
             icon=ft.Icons.HOME_OUTLINED,
             label="Inventario",
             selected_icon=ft.Icons.HOME
-        ),
-        ft.NavigationBarDestination(
-            icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
-            label="Perfil",
-            selected_icon=ft.Icons.ACCOUNT_CIRCLE
-        ),
+        )
     ]
     
-    # Solo supervisores pueden agregar
+    # indince supervisor
     if access_level == AccessLevel.SUPERVISOR:
-        destinations.insert(1, ft.NavigationBarDestination(
+        destinations.append(ft.NavigationBarDestination(
             icon=ft.Container(
                 content=ft.Icon(ft.Icons.ADD, color=ft.Colors.WHITE, size=20),
                 bgcolor=middle_color,
@@ -39,6 +34,21 @@ def global_navigation_bar(page: ft.Page, access_level: AccessLevel, on_change_ca
             ),
             label="Agregar"
         ))
+    
+    # indice solo admin
+    if access_level == AccessLevel.ADMIN:
+        destinations.append(ft.NavigationBarDestination(
+            icon=ft.Icons.PEOPLE_ALT_OUTLINED,
+            label="Trabajadores",
+            selected_icon=ft.Icons.PEOPLE
+        ))
+    
+    #se agrega como ultimo indice siempre
+    destinations.append(ft.NavigationBarDestination(
+        icon=ft.Icons.ACCOUNT_CIRCLE_OUTLINED,
+        label="Perfil",
+        selected_icon=ft.Icons.ACCOUNT_CIRCLE
+    ))
     
     return ft.NavigationBar(
         selected_index=0,

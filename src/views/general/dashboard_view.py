@@ -4,16 +4,24 @@ from src.enums.access_level import AccessLevel
 from src.utils.routes import register_view
 from src.utils.notification_handler import listen_to
 
+# barras de navegacion global
+from src.widgets.global_app_bar import global_app_bar
+from src.widgets.global_navigation_bar import global_navigation_bar
+
+# vista general
+from src.views.general.inventory_view import inventory
+from src.views.general.profile_view import profile_set
+
+#vista de admin
+from src.views.admin.worker_list_view import worker_list
+
+# vista de supervisor
 from src.views.supervisor.create_equipment_view import create_equipment_view
 from src.views.supervisor.create_maintenance_view import create_maintenance_view
 from src.views.supervisor.create_spare_view import create_spare_view
 
-from src.widgets.global_app_bar import global_app_bar
-from src.widgets.global_navigation_bar import global_navigation_bar
 from src.widgets.custom_snack_bar import custom_snack_bar
 
-from src.views.supervisor.inventory_view import inventory
-from src.views.general.profile_view import profile_set
 
 from src.consts.colors import middle_color
 
@@ -108,7 +116,7 @@ class DashboardView:
         self.page.close(self.add_options)
         self.navigation_bar.selected_index = self.last_selected_index
         
-        profile_index = 2 if self.access_level == "SUPERVISOR" else 1
+        profile_index = 2 if self.access_level in [AccessLevel.SUPERVISOR, AccessLevel.ADMIN] else 1
         
         self.content_area.controls.clear()
         if self.last_selected_index == 0:
@@ -122,12 +130,12 @@ class DashboardView:
     def on_navigation(self, e):
         selected_index = e.control.selected_index
 
+        workers_index = 1 if self.access_level == AccessLevel.ADMIN else None
         add_index = 1 if self.access_level == AccessLevel.SUPERVISOR else None
-        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else 1
+        profile_index = 2 if self.access_level in [AccessLevel.SUPERVISOR, AccessLevel.ADMIN] else 1
 
         if selected_index == add_index and self.access_level == AccessLevel.SUPERVISOR:
             self.page.open(self.add_options)
-
             e.control.selected_index = self.last_selected_index
             self.page.update()
             return
@@ -137,6 +145,8 @@ class DashboardView:
 
         if selected_index == 0:
             self.content_area.controls.append(inventory(self.page))
+        elif selected_index == workers_index and self.access_level == AccessLevel.ADMIN:
+            self.content_area.controls.append(worker_list(self.page))  
         elif selected_index == profile_index:
             self.content_area.controls.append(profile_set(self.page))
 
@@ -154,7 +164,7 @@ class DashboardView:
         )
         
 if __name__ == '__main__':
-    print('Cargando dashborad en modo debug')
+    print('Cargando dashboard en modo debug')
 
     def test_supervisor_page(page: ft.Page):
         page.title= "dashboard (DEBUG MODE)"

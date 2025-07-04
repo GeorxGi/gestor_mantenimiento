@@ -38,17 +38,6 @@ class WelcomePage:
                             size= 20,
                             color= ft.Colors.GREY_700
                         ),
-                        ft.Container(
-                            content=ft.Image(
-                                src= 'https://acortar.link/Y6WaMj',
-                                width= 200,
-                                height= 200,
-                                border_radius=20
-                            ),
-                            border_radius= 20,
-                            bgcolor= middle_color,
-                            padding= ft.padding.all(5)
-                        ),
                         gradient_button(
                             on_click= lambda e: self._go_to_login(),
                             text='Iniciar sesión',
