@@ -75,11 +75,11 @@ def create_maintenance_view(page: ft.Page, on_success=None):
         selected_technicians = technician_ids
 
     def open_equipment_dialog():
-        dialog = list_window("Seleccionar Equipo", page, "equipment", on_equipment_selected)
+        dialog = list_window(text= "Seleccionar Equipo", page= page, list_type= "equipment", on_select= on_equipment_selected)
         page.open(dialog)
     
     def open_technician_dialog():
-        dialog = list_window("Seleccionar Técnicos", page, "technician", on_technicians_selected, multi_select=True)
+        dialog = list_window(text= "Seleccionar Técnicos disponibles", page= page, list_type="technician", on_select= on_technicians_selected, multi_select=True)
         page.open(dialog)
 
 

@@ -62,7 +62,7 @@ def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
 
 def get_spare_by_partial_name(partial_str:str) -> list[Spare]:
     with SpareSQL() as db:
-        data = db.fetch_by_partial_name(partial_str)
+        data = db.fetch_all_spares() if not partial_str else db.fetch_by_partial_name(partial_str)
         return [Spare.from_dict(spr) for spr in data]
 
 if __name__ == '__main__':

@@ -16,22 +16,49 @@ def inventory(page: ft.Page):
     show_equipment = ft.Ref[bool]()
     show_pieces.current = True
     show_equipment.current = False
+
+    # Piezas de la base de datos
+    spare_objects = get_spare_by_partial_name('')
+    # Equipos de la base de datos
+    equipment_objects = []
+
+    def add_filters():
+        if show_pieces.current:
+            nonlocal spare_objects
+            spare_objects = get_spare_by_partial_name(search_field.value)
+        elif show_equipment.current:
+            nonlocal equipment_objects
+            equipment_objects = get_equipment_by_partial_name(search_field.value)
+
+        update_cards()
+
+    search_field = ft.TextField(
+        hint_text="buscar por nombre...",
+        prefix_icon=ft.Icons.SEARCH,
+        width=300,
+        on_submit= lambda _: add_filters(),
+        border_radius= ft.border_radius.all(30),
+        border_color=ft.Colors.GREY_300)
+
+
     
     def update_filters(pieces, equipment):
         show_pieces.current = pieces
         show_equipment.current = equipment
+        if show_pieces.current:
+            nonlocal spare_objects
+            spare_objects = get_spare_by_partial_name('')
+        elif show_equipment.current:
+            nonlocal equipment_objects
+            equipment_objects = get_equipment_by_partial_name('')
         update_cards()
     
     def open_filter_dialog(e):
         filter_dialog(page, update_filters)
     
     search_bar = ft.Row(
-        [
-           ft.TextField(hint_text="buscar por nombre...",
-                        prefix_icon=ft.Icons.SEARCH,
-                        width=300,
-                        border_radius= ft.border_radius.all(30),
-                        border_color=ft.Colors.GREY_300),
+        controls= [
+            search_field,
             ft.IconButton(
                 bgcolor= middle_color,
                 icon_color=ft.Colors.WHITE,
@@ -44,21 +71,6 @@ def inventory(page: ft.Page):
         spacing= 10
     )
     
-    # Datos de ejemplo
-    spare_data = get_spare_by_partial_name("")
-    
-    # Obtener equipos de la base de datos
-    equipment_objects = get_equipment_by_partial_name("")
-    equipment_data = [
-        {
-            "code": eq.code,
-            "name": eq.name,
-            "Descripción": eq.description,  # Agregar si tienes este campo
-            "Proveedor": eq.provider  # Usando provider como modelo temporalmente
-        }
-        for eq in equipment_objects
-    ]
-    
     def create_content():
         if show_pieces.current:
             # Crear filas de 2 cards para piezas
@@ -69,7 +81,7 @@ def inventory(page: ft.Page):
                     name=spare.name,
                     on_click=lambda _, code = spare.code, name = spare.name, quantity = spare.amount, img_pth = spare.image_path:
                     spare_details_window(page= page,code= code,name=  name, quantity= quantity, image_src= img_pth)
-                ) for spare in spare_data
+                ) for spare in spare_objects
             ]
             
             card_rows = []

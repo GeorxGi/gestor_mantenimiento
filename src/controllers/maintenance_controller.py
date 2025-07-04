@@ -113,5 +113,15 @@ def get_all_technician_maintenances(technician_id:str):
     with MaintenanceSQL() as db:
         return db.fetchall_technician_maintenances(technician_id)
 
+def get_equipment_maintenance_info(equipment_code:str) -> list[dict]:
+    if not equipment_code:
+        return []
+    with MaintenanceSQL() as db:
+        maint = db.fetchall_equipment_maintenances(equipment_code)
+        return []
+        #TERMINAR AQUI
+        #return [Maintenance.from_dict(data) for data in maint]
+
 if __name__ == '__main__':
+    print(get_equipment_maintenance_info("TUPAPA"))
     print (get_all_technician_maintenances("f912486a-ff6e-4dca-bc66-101e87203a48"))

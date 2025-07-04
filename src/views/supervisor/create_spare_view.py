@@ -59,15 +59,15 @@ def create_spare_view(page:ft.Page, on_success=None):
             else:
                 page.open(custom_snack_bar(content="Ocurrió un error a la hora de cargar la imágen"))
             page.update()
-    
+
     file_picker = ft.FilePicker(on_result=on_file_picked)
     page.overlay.append(file_picker)
 
     picked_file: None | bytes = None
-    
+
     code_input = input_form(label="Código de pieza", icon=ft.Icons.QR_CODE_2)
     code_input.disabled = True
-    
+
     name_input = input_form(
         label="Nombre",
         icon=ft.Icons.EDIT_ROUNDED)
@@ -87,7 +87,7 @@ def create_spare_view(page:ft.Page, on_success=None):
                 ft.Icons.EXTENSION,
                 size= 80,
                 color= middle_color
-                ),
+            ),
             ft.Text(
                 value="Agregar pieza",
                 size= 25,
@@ -100,7 +100,7 @@ def create_spare_view(page:ft.Page, on_success=None):
         horizontal_alignment= ft.CrossAxisAlignment.CENTER,
         spacing= 10
     )
-    
+
     image_preview = ft.Container(
         width= 150,
         height= 150,
@@ -111,13 +111,13 @@ def create_spare_view(page:ft.Page, on_success=None):
             ft.Icons.IMAGE,
             size= 100,
             color= ft.Colors.WHITE
-            )
         )
-    
+    )
+
     row_image = ft.Stack(
         controls=[
             ft.Container(
-            height=150,
+                height=150,
                 content=image_preview,
                 alignment=ft.alignment.center
             ),
@@ -134,7 +134,7 @@ def create_spare_view(page:ft.Page, on_success=None):
             )
         ],
     )
-    
+
     container_form = ft.Container(
         width= 400,
         height= 550,
@@ -154,7 +154,7 @@ def create_spare_view(page:ft.Page, on_success=None):
             ]
         )
     )
-    
+
     return ft.Container(
         content = ft.Column(
             scroll= ft.ScrollMode.AUTO,

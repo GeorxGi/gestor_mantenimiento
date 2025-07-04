@@ -2,7 +2,6 @@ import flet as ft
 
 from src.models.equipment import Equipment
 
-
 def equipment_details_dialog(page: ft.Page, equipment:Equipment):
     
     dialog = ft.AlertDialog(
