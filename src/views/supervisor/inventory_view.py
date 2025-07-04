@@ -51,7 +51,7 @@ def inventory(page: ft.Page):
     spare_data = get_all_spares()
     
     # Obtener equipos de la base de datos
-    equipment_objects = get_all_equipments()
+    equipment_objects = get_equipment_by_partial_name("")
     equipment_data = [
         {
             "code": eq.code,
@@ -136,11 +136,11 @@ def inventory(page: ft.Page):
                         on_click=lambda e, item=item: equipment_details_dialog(
                             page, item["code"], item["name"], item["description"], item["provider"]
                         )
-                    )
-                    equipment_list.append(equipment_item)
+                    ) for equipment in equipment_objects
+                ]
             else:
                 equipment_list.append(
-                    ft.Text("No hay equipos registrados", color=ft.Colors.GREY_500, size=16)
+                    ft.Text(value= "No hay equipos registrados", color=ft.Colors.GREY_500, size=16)
                 )
             
             return [ft.Column(controls=equipment_list, spacing=5)]
@@ -185,7 +185,7 @@ def inventory(page: ft.Page):
         content_container.update()
     
     return ft.Column(
-        [
+        controls= [
            search_bar,
            ft.Divider(height= 20, color= ft.Colors.GREY_300),
            ft.Container(

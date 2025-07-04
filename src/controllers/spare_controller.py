@@ -3,11 +3,14 @@ import io
 from src.consts.file_dir import SPARE_IMAGES_PATH
 import os
 
+from src.models.spare import Spare
 from src.controllers.sql.spare_sql import SpareSQL
+
 from src.enums.create_spare_cases import CreateSpareCases
+
 from PIL import Image
 
-def process_and_store_image(image_bytes, output_path:str):
+def __process_and_store_image(image_bytes, output_path:str):
     #Valída que los bytes ingresados representen una imagen
     try:
         with Image.open(io.BytesIO(image_bytes)) as img:
@@ -34,10 +37,10 @@ def process_and_store_image(image_bytes, output_path:str):
         return False
 
 def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
-    #Valida que no se hayan ingresado datos en blanco
+    #Valída que no se hayan ingresado datos en blanco
     if not name or not amount:
         return CreateSpareCases.EMPTY_INPUT
-    #Valida que no se intenten almacenar cero piezas en la DB
+    #Valída que no se intenten almacenar cero piezas en la DB
     if amount <= 0:
         return CreateSpareCases.INVALID_AMOUNT
 
@@ -53,23 +56,19 @@ def add_spare(name:str, amount:int, image_bytes:bytes=None) -> CreateSpareCases:
     if image_bytes:
         os.makedirs(SPARE_IMAGES_PATH, exist_ok= True)
         image_path = f"{SPARE_IMAGES_PATH}/{spare_code}.jpg"
-        process_and_store_image(image_bytes, image_path)
+        __process_and_store_image(image_bytes, image_path)
 
     return CreateSpareCases.CORRECT
 
 def get_all_spares() -> list[dict]:
     """Obtiene todas las piezas de repuesto de la base de datos"""
     with SpareSQL() as db:
-        return db.get_all_spares()
+        return db.fetch_all_spares()
+
+def get_spare_by_partial_name(partial_str:str) -> list[Spare]:
+    with SpareSQL() as db:
+        data = db.fetch_by_partial_name(partial_str)
+        return [Spare.from_dict(spr) for spr in data]
 
 if __name__ == '__main__':
-    test_image_path = "D:/Grabaciones/Marvel Rivals/Marvel Rivals_2024.12.06-01.20.png"
-
-    with open(test_image_path, "rb") as file:
-        img_byt = file.read()
-
-    add_spare(
-        name= 'Pieza de prueba',
-        amount= 5,
-        image_bytes= img_byt
-    )
+    get_spare_by_partial_name("")

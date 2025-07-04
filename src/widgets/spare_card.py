@@ -1,8 +1,8 @@
 import flet as ft
 
-from src.consts.colors import *
+from src.consts.colors import middle_color
 
-def spare_card(code="1234", name="Pieza", image_src=None, on_click=None) -> ft.GestureDetector:
+def spare_card(*, code:int | str, name:str, image_src:str = None, on_click=None) -> ft.GestureDetector:
     
     container_img = ft.Container(
         width=120,
@@ -10,7 +10,12 @@ def spare_card(code="1234", name="Pieza", image_src=None, on_click=None) -> ft.G
         bgcolor=ft.Colors.GREY_100,
         border_radius=15,
         alignment=ft.alignment.center,
-        content=ft.Image(src=image_src, fit=ft.ImageFit.COVER, border_radius=ft.border_radius.all(13)) if image_src else ft.Icon(
+        content=
+        ft.Image(
+            src=image_src,
+            fit=ft.ImageFit.COVER,
+            border_radius=ft.border_radius.all(13)
+        ) if image_src else ft.Icon(
             ft.Icons.IMAGE,
             size=35,
             color= ft.Colors.GREY_300
@@ -18,7 +23,7 @@ def spare_card(code="1234", name="Pieza", image_src=None, on_click=None) -> ft.G
     )
     
     code_spare = ft.Text(
-        f"#{code}", 
+        value= f"#{code}",
         size=11, 
         color= middle_color,
         weight=ft.FontWeight.BOLD

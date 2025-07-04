@@ -45,6 +45,23 @@ class EquipmentSQL(BaseSqlController):
         )
         return dict(data_fetch) if data_fetch else None
 
+    def fetch_equipment_pending_maintenances(self, equipment_code:str) -> list[dict]:
+        data = self._fetchall(
+            query= f"""
+                SELECT 
+                    m.maintenance_date,
+                    m.details,
+                    m.supervisor_id
+                FROM {self.table()} m
+                WHERE m.equipment_code = ?
+                AND m.is_pending = 1
+                    ORDER BY m.maintenance_date ASC
+
+            """,
+            params= (equipment_code, )
+        )
+        return [maint[0] for maint in data]
+
 if __name__ == '__main__':
     with EquipmentSQL() as db:
         value = db.get_by_partial_name("Lav")
