@@ -38,7 +38,7 @@ class DashboardView:
         # Obtener el nivel de acceso del usuario logueado
         user_data = self.page.session.get("local_user")
 
-        self.access_level:AccessLevel = AccessLevel.from_string(user_data.get("access_level")) if user_data else AccessLevel.SUPERVISOR
+        self.access_level:AccessLevel = AccessLevel.from_string(user_data.get("access_level")) if user_data else AccessLevel.USER
         
         # Mostrar mensaje de bienvenida si viene del login
         if user_data and not self.page.session.get("welcome_shown"):

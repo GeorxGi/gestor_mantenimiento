@@ -71,6 +71,7 @@ def create_equipment_view(page: ft.Page, on_success = None):
     )
     return ft.Container(
         content= ft.Column(
+            scroll= ft.ScrollMode.AUTO,
             controls=[
                 container_form,
                 gradient_button(

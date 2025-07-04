@@ -62,7 +62,7 @@ class UserSQL(BaseSqlController):
         )
         return [dict(row) for row in rows]
 
-    def fetch_not_busy_technicians(self) -> list[dict]:
+    def fetch_available_technicians(self) -> list[dict]:
         return[
             dict(row) for row in self._fetchall(
                 query= f"""
@@ -90,6 +90,6 @@ class UserSQL(BaseSqlController):
 
 if __name__ == '__main__':
     with UserSQL() as db:
-        response = db.fetch_not_busy_technicians()
+        response = db.fetch_available_technicians()
         for value in response:
             print(value)

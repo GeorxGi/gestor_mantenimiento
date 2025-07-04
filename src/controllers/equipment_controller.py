@@ -40,5 +40,10 @@ def get_all_equipments() -> list[Equipment]:
         equipments = db.get_by_partial_name("")
         return [Equipment.from_dict(eq) for eq in equipments]
 
+def get_equipment_by_partial_name(part_name:str) -> list[Equipment]:
+    with EquipmentSQL() as db:
+        values = db.get_by_partial_name(part_name)
+        return [Equipment.from_dict(eq) for eq in values]
+
 if __name__ == '__main__':
     pass

@@ -1,6 +1,6 @@
 import flet as ft
             
-def input_form(*, label: str, icon: str, disabled: bool = True) -> ft.TextField:
+def input_form(*, label: str, icon: str, disabled: bool = False, keyboard_type:ft.KeyboardType = ft.KeyboardType.TEXT, input_filter:ft.InputFilter = None) -> ft.TextField:
     # Normalize the label for comparison to avoid case-sensitivity issues
     normalized_label = label.lower()
 
@@ -35,6 +35,9 @@ def input_form(*, label: str, icon: str, disabled: bool = True) -> ft.TextField:
         e.page.update() # Essential to see error_text changes
 
     return ft.TextField(
+        disabled= disabled,
+        keyboard_type= keyboard_type,
+        input_filter= input_filter,
         label=label,
         label_style=ft.TextStyle(
             color=ft.Colors.GREY_600,
