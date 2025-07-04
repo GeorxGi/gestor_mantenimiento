@@ -73,7 +73,7 @@ def inventory(page: ft.Page):
         
         update_cards()
     
-    def open_filter_dialog(e):
+    def open_filter_dialog(_):
         filter_dialog(page, update_filters)
     
     search_bar = ft.Row(
@@ -99,8 +99,8 @@ def inventory(page: ft.Page):
                     image_src= spare.image_path,
                     code=spare.code,
                     name=spare.name,
-                    on_click=lambda _, code = spare.code, name = spare.name, quantity = spare.amount, img_pth = spare.image_path:
-                    spare_details_window(page= page,code= code,name=  name, quantity= quantity, image_src= img_pth, user_access_level=user_access_level)
+                    on_click=lambda _, item= spare:
+                    spare_details_window(page= page, spare= item, user_access_level=user_access_level)
                 ) for spare in spare_objects
             ]
             

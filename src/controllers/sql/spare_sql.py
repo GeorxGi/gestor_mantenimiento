@@ -26,6 +26,42 @@ class SpareSQL(BaseSqlController):
         )
         return [dict(value) for value in data]
 
+    def delete_spare(self, spare_code:int) -> bool:
+        if not spare_code:
+            return False
+        return self._execute(
+            query= f"DELETE FROM {self.table()} WHERE code = ?",
+            params= (spare_code, )
+        )
+
+    def fetch_by_code(self, spare_code:int) -> dict:
+        """Obtiene un spare en base al codigo ingresado"""
+        return dict(
+            self._fetchone(
+                query= f"SELECT * FROM {self.table()} WHERE code = ?",
+                params= (spare_code, )
+            )
+        )
+    def discount_spare_stock(self, code:int, amount:int, ):
+        self._execute(
+            query= f"""
+                UPDATE {self.table()}
+                SET amount = amount - ?
+                WHERE code = ? 
+            """,
+            params= (amount, code)
+        )
+
+    def add_spare_stock(self, code:int, amount:int):
+        self._execute(
+            query= f"""
+                UPDATE {self.table()}
+                SET amount = amount + ?
+                WHERE code = ? 
+            """,
+            params= (amount, code)
+        )
+
 if __name__ == '__main__':
     with SpareSQL() as db:
         print(db.fetch_all_spares())

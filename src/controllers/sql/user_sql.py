@@ -22,6 +22,24 @@ class UserSQL(BaseSqlController):
                 """,
             params= (new_id, fullname, username, password, email, access_level.name, assigned_maintenance_id))
 
+    def fetchall_users_by_partial_name(self, partial_name:str) -> list[dict]:
+        rows = self._fetchall(
+            query= f"""
+                SELECT {self.public_fields}
+                FROM {self.table()}
+                WHERE LOWER(fullname) LIKE ?
+            """,
+            params= (f"%{partial_name.lower()}%",)
+        )
+        return [dict(row) for row in rows]
+
+    def fetchall_users(self) -> list[dict]:
+        rows = self._fetchall(
+            query= f"SELECT {self.public_fields} FROM {self.table()}",
+            params= ()
+        )
+        return [dict(row) for row in rows]
+
     def fetch_by_username(self, username:str) -> dict:
         row = self._fetchone(
             query= f"SELECT {self.public_fields} FROM {self.table()} WHERE username = ?",

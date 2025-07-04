@@ -85,7 +85,7 @@ class DashboardView:
                             size=25),
                         ButtonsAdd(text= "Equipo", on_click_event= lambda _: navigate_to(create_equipment_view)),
                         ButtonsAdd(text= "Orden de mantenimiento", on_click_event= lambda _: navigate_to(create_maintenance_view)),
-                        ButtonsAdd(text= "Solicitud de pieza", on_click_event= lambda _: navigate_to(create_spare_view)),
+                        ButtonsAdd(text= "Registrar pieza", on_click_event= lambda _: navigate_to(create_spare_view)),
                     ], 
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER, 
                     spacing=10

@@ -17,6 +17,14 @@ def get_user_by_id(user_id:str) -> Technician | Supervisor | Admin | None:
         data = db.fetch_user_by_id(user_id)
         return _create_user_from_dict(data)
 
+def get_users_by_partial_name(partial_name:str) -> list[Technician | Supervisor | Admin]:
+    with UserSQL() as db:
+        if not partial_name:
+            data = db.fetchall_users()
+        else:
+            data = db.fetchall_users_by_partial_name(partial_name)
+        return [_create_user_from_dict(user) for user in data]
+
 def get_all_available_technicians() -> list[Technician]:
     with UserSQL() as db:
         data = db.fetch_available_technicians()
@@ -65,6 +73,9 @@ def _create_user_from_dict(user_dict:dict) -> Technician | Supervisor | Admin | 
 
 #Pruebas unitarias
 if __name__ == '__main__':
-    print(is_valid_mail('correo@gmail.com'))
-    print(is_valid_mail('falso@.com'))
-    print(is_valid_mail('correo-seguro@net-star.net'))
+    data = get_users_by_partial_name('Supe')
+    for row in data:
+        print(row.fullname)
+    #print(is_valid_mail('correo@gmail.com'))
+    #print(is_valid_mail('falso@.com'))
+    #print(is_valid_mail('correo-seguro@net-star.net'))

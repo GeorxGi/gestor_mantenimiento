@@ -65,5 +65,31 @@ def get_spare_by_partial_name(partial_str:str) -> list[Spare]:
         data = db.fetch_all_spares() if not partial_str else db.fetch_by_partial_name(partial_str)
         return [Spare.from_dict(spr) for spr in data]
 
+def remove_spare_from_inventory(spare_code:int) -> bool:
+    if not spare_code:
+        return False
+    with SpareSQL() as db:
+        return db.delete_spare(spare_code)
+
+def discount_spare_stock(spare_code:int, request_ammount:int) -> bool:
+    """Metodo para sustraer repuestos de la base de datos (retorna falso si no se encontro o no hay suficiente cantidad)"""
+    if not spare_code or not request_ammount:
+        return False
+    with SpareSQL() as db:
+        result = db.fetch_by_code(spare_code)
+        spare = Spare.from_dict(result)
+        if spare.amount < request_ammount:
+            return False
+        db.discount_spare_stock(amount= request_ammount, code= spare.code)
+        return True
+
+def add_spare_stock(spare_code:int, to_add_amount:int) -> bool:
+    """Metodo para reponer inventario de una pieza determinada"""
+    if not spare_code or not to_add_amount:
+        return False
+    with SpareSQL() as db:
+        db.add_spare_stock(spare_code, to_add_amount)
+        return True
+
 if __name__ == '__main__':
     get_spare_by_partial_name("")

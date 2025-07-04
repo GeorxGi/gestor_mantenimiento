@@ -13,6 +13,14 @@ def notify_supervisors(event:str, content:str):
                 "content": content
             })
 
+def notify_admins(event:str, content:str):
+    for session in listening_sessions.values():
+        if session["access_level"] == AccessLevel.ADMIN.name:
+            session["page"].pubsub.send_all({
+                "event": event,
+                "content": content
+            })
+
 def listen_to(page: ft.Page, user_id:str, access_level:AccessLevel):
     listening_sessions[page.session_id] = {
         "page": page,
