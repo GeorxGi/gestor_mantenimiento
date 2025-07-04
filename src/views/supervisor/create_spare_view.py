@@ -1,5 +1,3 @@
-import base64
-
 import flet as ft
 
 from src.widgets.custom_snack_bar import custom_snack_bar
@@ -53,7 +51,7 @@ def create_spare_view(page:ft.Page, on_success=None):
 
             if picked_image_bytes:
                 image_preview.content = ft.Image(
-                    src_base64=base64.b64encode(picked_image_bytes).decode("utf-8"),
+                    src= selected_file.path,
                     width=150,
                     height=150,
                     fit=ft.ImageFit.COVER
