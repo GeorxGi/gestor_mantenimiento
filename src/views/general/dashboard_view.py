@@ -14,6 +14,7 @@ from src.widgets.custom_snack_bar import custom_snack_bar
 
 from src.views.supervisor.inventory_view import inventory
 from src.views.general.profile_view import profile_set
+from src.views.admin.workers_list_view import workers_list_view
 
 from src.consts.colors import middle_color
 
@@ -108,11 +109,14 @@ class DashboardView:
         self.page.close(self.add_options)
         self.navigation_bar.selected_index = self.last_selected_index
         
-        profile_index = 2 if self.access_level == "SUPERVISOR" else 1
+        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else (2 if self.access_level == AccessLevel.ADMIN else 1)
+        workers_index = 1 if self.access_level == AccessLevel.ADMIN else None
         
         self.content_area.controls.clear()
         if self.last_selected_index == 0:
             self.content_area.controls.append(inventory(self.page))
+        elif self.last_selected_index == workers_index and self.access_level == AccessLevel.ADMIN:
+            self.content_area.controls.append(workers_list_view(self.page))
         elif self.last_selected_index == profile_index:
             self.content_area.controls.append(profile_set(self.page))
         
@@ -123,11 +127,11 @@ class DashboardView:
         selected_index = e.control.selected_index
 
         add_index = 1 if self.access_level == AccessLevel.SUPERVISOR else None
-        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else 1
+        workers_index = 1 if self.access_level == AccessLevel.ADMIN else None
+        profile_index = 2 if self.access_level == AccessLevel.SUPERVISOR else (2 if self.access_level == AccessLevel.ADMIN else 1)
 
         if selected_index == add_index and self.access_level == AccessLevel.SUPERVISOR:
             self.page.open(self.add_options)
-
             e.control.selected_index = self.last_selected_index
             self.page.update()
             return
@@ -137,6 +141,8 @@ class DashboardView:
 
         if selected_index == 0:
             self.content_area.controls.append(inventory(self.page))
+        elif selected_index == workers_index and self.access_level == AccessLevel.ADMIN:
+            self.content_area.controls.append(workers_list_view(self.page))
         elif selected_index == profile_index:
             self.content_area.controls.append(profile_set(self.page))
 

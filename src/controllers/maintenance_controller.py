@@ -133,6 +133,26 @@ def get_all_maintenances() -> list[Maintenance]:
         rows = db.fetchall_maintenances()
         return [Maintenance.from_dict(maint) for maint in rows]
 
+def get_all_maintenance_orders() -> list[Maintenance]:
+    """Obtiene todas las órdenes de mantenimiento"""
+    with MaintenanceSQL() as db:
+        return db.fetchall_maintenance_orders()
+
+def get_technician_names_for_maintenance(maintenance_id: str) -> list[str]:
+    """Obtiene los nombres de los técnicos asignados a un mantenimiento"""
+    if not maintenance_id:
+        return []
+    
+    with MaintenanceSQL() as db:
+        technician_ids = db.fetchall_technicians_in_maintenance(maintenance_id)
+    
+    if not technician_ids:
+        return []
+    
+    with UserSQL() as db:
+        technicians_data = db.fetchall_by_id([tech_id[0] for tech_id in technician_ids])
+        return [tech.get("fullname", "Desconocido") for tech in technicians_data]
+
 if __name__ == '__main__':
     print(get_equipment_maintenance_info("TUPAPA"))
     print (get_all_technician_maintenances("f912486a-ff6e-4dca-bc66-101e87203a48"))
